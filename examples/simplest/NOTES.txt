@@ -1,0 +1,12 @@
+build
+ npm install
+ mkdir src/generated
+ ./node_modules/slice2js/build/Release/slice2js --output-dir src/generated Hello.ice
+ ./node_modules/rollup/dist/bin/rollup -c
+
+run
+ python run-backend.py
+ 
+ cd public && python -m SimpleHTTPServer
+ -- or
+ browse file:///home/asmirnov/czc/examples/simplest/index.html

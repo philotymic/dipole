@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <script src="./node_modules/ice/lib/Ice.js"></script>
+    <script>
+      	let init_data = new Ice.InitializationData();
+	let props = Ice.createProperties();
+	props.setProperty("Ice.ACM.Close", "0");
+	props.setProperty("oa.AdapterId", "dummy1");
+	init_data.properties = props;
+	window.ic = Ice.initialize(null, init_data);	
+	console.log("Ice init done");
+    </script>
+  </head>  
+  <body>
+    <div id="root"></div>
+    <script src="public/bundle.js"></script>
+  </body>
+</html>

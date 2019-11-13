@@ -1,0 +1,21 @@
+build
+ npm install
+ mkdir src/generated
+
+ # messy magic here -- includes of ice modules seems to be fine to include as is unlike my includes in nestedmodules example
+ cat Topics.ice > ./src/generated/all-mods.ice
+ ./node_modules/slice2js/build/Release/slice2js --output-dir src/generated -I./node_modules/slice2js/ice/slice src/generated/all-mods.ice
+
+
+ ./node_modules/slice2js/build/Release/slice2js --output-dir src/generated ./Topics.ice
+ ./node_modules/rollup/dist/bin/rollup -c
+
+run
+ python run-backend.py
+ python run-tests.py test-publisher
+ python run-tests.py test-subscriber
+ python run-tests.py test-subscriberviaid
+ 
+ cd public && python -m SimpleHTTPServer
+ -- or
+ browse file:///home/asmirnov/czc/examples/bidir/index.html
