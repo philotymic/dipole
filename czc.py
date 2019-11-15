@@ -5,22 +5,6 @@ from cefpython3 import cefpython as cef
 import platform
 import sys
 
-def main():
-    check_versions()
-    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
-    browser_settings = {
-        #"file_access_from_file_urls_allowed": True,
-        #"universal_access_from_file_urls_allowed": True
-    }
-    cef.Initialize()
-    #url = "file:///home/asmirnov/czc/examples/simplest/index.html"
-    url = "file:///home/asmirnov/czc/examples/nestedmodules/index.html"
-    browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
-    #ipdb.set_trace()
-    cef.MessageLoop()
-    cef.Shutdown()
-
-
 def check_versions():
     ver = cef.GetVersion()
     print("[hello_world.py] CEF Python {ver}".format(ver=ver["version"]))
@@ -33,4 +17,17 @@ def check_versions():
 
 
 if __name__ == '__main__':
-    main()
+    url = sys.argv[1]
+    check_versions()
+    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    browser_settings = {
+        #"file_access_from_file_urls_allowed": True,
+        #"universal_access_from_file_urls_allowed": True
+    }
+    cef.Initialize()
+    #url = "file:///home/asmirnov/czc/examples/simplest/index.html"
+    #url = "file:///home/asmirnov/czc/examples/nestedmodules/index.html"
+    browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
+    #ipdb.set_trace()
+    cef.MessageLoop()
+    cef.Shutdown()
