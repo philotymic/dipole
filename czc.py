@@ -1,10 +1,56 @@
 # Hello world example. Doesn't depend on any third party GUI framework.
 # Tested with CEF Python v57.0+.
-#import ipdb
+import ipdb
 from cefpython3 import cefpython as cef
 import platform
 import sys, os.path
+import tempfile
+import subprocess, shlex, threading
 
+class Backend:
+    def __init__(self, czcapp_top):
+        self.czcapp_top = czcapp_top
+        self.backend_port = None
+        self.xfn = None # TemporaryFile object, used to return port number assigned by backend
+        self.browser = None
+
+    def JS_get_backend_port(self, js_value, js_callback):
+        print "Backend::JS_get_backend_port: js_value:", js_value
+        js_callback.Call(self.backend_port, None)
+
+    def run_backend(self):
+        self.t1 = threading.Thread(target = self.backend_thread)
+        self.t1.daemon = True
+        self.t1.start()
+        
+    def backend_thread(self):
+        self.xfn = tempfile.mkstemp()
+        backend_path = os.path.join(self.czcapp_top, "backend/run-backend.py")
+        python_path = "/usr/local/anaconda2/bin/python"
+        cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn[1])
+        def setpgidfn():
+            os.setpgid(0, 0)
+        pp = subprocess.Popen(shlex.split(cmd), env = {'topdir': self.czcapp_top}, stdout = subprocess.PIPE) # , preexec_fn = setpgidfn)
+        pgid = os.getpgid(os.getpid())
+        print "pgid, pid", pgid, os.getpid()
+        print "be pgid, pid", os.getpgid(pp.pid), pp.pid
+        os.setpgid(0, 0) # session id -- http://www.informit.com/articles/article.aspx?p=397655&seqNum=6
+        #pp.stdout.read()
+
+        #ipdb.set_trace()
+        lines = pp.stdout.readline()
+
+        self.backend_port = int(open(self.xfn[1]).read())
+        os.unlink(self.xfn[1])            
+
+        print "WAITING"
+        pp.wait()
+        print "WAITING DONE"
+
+        self.browser.CloseBrowser()
+        
+        sys.exit(0)
+        
 def check_versions():
     ver = cef.GetVersion()
     print("[hello_world.py] CEF Python {ver}".format(ver=ver["version"]))
@@ -15,25 +61,12 @@ def check_versions():
            arch=platform.architecture()[0]))
     assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
 
-class Backend:
-    def __init__(self):
-        self.backend_port = None
-
-    def JS_get_backend_port(self, js_value, js_callback):
-        print "Backend::JS_get_backend_port: js_value:", js_value
-        js_callback.Call(self.backend_port, None)
-        
-    def run_backend(self, czcapp_top):
-        backend_path = os.path.join(czcapp_top, "backend/run-backend.py")
-        self.backend_port = 12345
-
 if __name__ == '__main__':
     czcapp_top = sys.argv[1]
     check_versions()
 
-    backend = Backend()
-    backend.run_backend(czcapp_top)
-    
+    backend = Backend(czcapp_top)
+    backend.run_backend()    
     
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
     browser_settings = {
@@ -45,6 +78,7 @@ if __name__ == '__main__':
     url = "file://" + os.path.join(os.path.expanduser(czcapp_top), "frontend/index.html")
     print "URL:", url
     browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
+    backend.browser = browser
 
     # see also https://github.com/cztomczak/cefpython/blob/master/examples/snippets/javascript_bindings.py
     bindings = cef.JavascriptBindings()
