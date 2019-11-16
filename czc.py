@@ -41,6 +41,7 @@ class Backend:
         lines = pp.stdout.readline()
 
         self.backend_port = int(open(self.xfn[1]).read())
+        print "backend port:", self.backend_port
         os.unlink(self.xfn[1])            
 
         print "WAITING"
