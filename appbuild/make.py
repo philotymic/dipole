@@ -10,10 +10,16 @@ def install_cmds(top):
     return cmds
 
 def build_cmds(top):
+    dd = {}
+    dd["top"] = top
+    dd["slice2js"] = "./node_modules/slice2js/build/Release/slice2js"
+    dd["ice_slice_dir"] = "./node_modules/slice2js/ice/slice"
+    dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"
+
     cmds = []
-    cmds.append("cat {top}/backend/backend.ice > {top}/frontend/src/gen-js/all-mods.ice".format(top=top))
-    cmds.append("(cd {top}/frontend && ./node_modules/slice2js/build/Release/slice2js --output-dir src/gen-js -I./node_modules/slice2js/ice/slice src/gen-js/all-mods.ice)".format(top=top))
-    cmds.append("(cd {top}/frontend && ./node_modules/rollup/dist/bin/rollup -c)".format(top=top))
+    #cmds.append("cd {top}/frontend && {slice2js} -E -I{ice_slice_dir} ../backend/backend.ice | grep -v '^#' > src/gen-js/all-mods.ice".format(**dd))
+    cmds.append("cd {top}/frontend && {slice2js} --output-dir src/gen-js -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
+    cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 
 def clean_cmds(top):
@@ -38,6 +44,9 @@ if __name__ == "__main__":
         raise Exception("unknown action %s" % action)
 
     for cmd in cmds:
-        print cmd
-        os.system(cmd)
+        print "CMD:", cmd
+        e_code = os.system(cmd)
+        if e_code != 0:
+            print "command failed"
+            break
     
