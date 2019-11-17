@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     # see also https://github.com/cztomczak/cefpython/blob/master/examples/snippets/javascript_bindings.py
     bindings = cef.JavascriptBindings()
-    bindings.SetFunction("getBackendPort", backend.JS_get_backend_port)
+    bindings.SetFunction("czc_getBackendPort", backend.JS_get_backend_port)
     browser.SetJavascriptBindings(bindings)
 
     #ipdb.set_trace()
