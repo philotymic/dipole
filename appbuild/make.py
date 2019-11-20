@@ -6,7 +6,7 @@ from topdir import topdir
 def install_cmds(top):
     cmds = []
     cmds.append("cd {top}/frontend && npm install".format(top = top))
-    cmds.append("cd {top}/frontend && mkdir src/gen-js".format(top = top))
+    cmds.append("cd {top}/frontend && mkdir gen-js".format(top = top))
     return cmds
 
 def build_cmds(top):
@@ -17,8 +17,7 @@ def build_cmds(top):
     dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"
 
     cmds = []
-    #cmds.append("cd {top}/frontend && {slice2js} -E -I{ice_slice_dir} ../backend/backend.ice | grep -v '^#' > src/gen-js/all-mods.ice".format(**dd))
-    cmds.append("cd {top}/frontend && {slice2js} --output-dir src/gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
+    cmds.append("cd {top}/frontend && {slice2js} --output-dir gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 
@@ -27,7 +26,7 @@ def clean_cmds(top):
     cmds.append("rm -f *~ {top}/frontend/package-lock.json".format(top = top))
     cmds.append("rm -rf {top}/frontend/node_modules".format(top = top))
     cmds.append("rm -rf {top}/frontend/public".format(top = top))
-    cmds.append("rm -rf {top}/frontend/src/gen-js".format(top = top))
+    cmds.append("rm -rf {top}/frontend/gen-js".format(top = top))
     return cmds
 
 if __name__ == "__main__":
