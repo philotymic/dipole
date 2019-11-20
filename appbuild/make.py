@@ -24,7 +24,7 @@ def build_cmds(top):
 
 def clean_cmds(top):
     cmds = []
-    cmds.append("rm -f {top}/frontend/package-lock.json".format(top = top))
+    cmds.append("rm -f *~ {top}/frontend/package-lock.json".format(top = top))
     cmds.append("rm -rf {top}/frontend/node_modules".format(top = top))
     cmds.append("rm -rf {top}/frontend/public".format(top = top))
     cmds.append("rm -rf {top}/frontend/src/gen-js".format(top = top))
