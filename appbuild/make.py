@@ -18,7 +18,7 @@ def build_cmds(top):
 
     cmds = []
     #cmds.append("cd {top}/frontend && {slice2js} -E -I{ice_slice_dir} ../backend/backend.ice | grep -v '^#' > src/gen-js/all-mods.ice".format(**dd))
-    cmds.append("cd {top}/frontend && {slice2js} --output-dir src/gen-js -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
+    cmds.append("cd {top}/frontend && {slice2js} --output-dir src/gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 
