@@ -8,8 +8,8 @@ import tempfile
 import subprocess, shlex, threading
 
 class Backend:
-    def __init__(self, czcapp_top):
-        self.czcapp_top = czcapp_top
+    def __init__(self, dplapp_top):
+        self.dplapp_top = dplapp_top
         self.backend_port = None
         self.xfn = None # TemporaryFile object, used to return port number assigned by backend
         self.browser = None
@@ -25,12 +25,12 @@ class Backend:
         
     def backend_thread(self):
         self.xfn = tempfile.mkstemp()
-        backend_path = os.path.join(self.czcapp_top, "backend/run-backend.py")
+        backend_path = os.path.join(self.dplapp_top, "backend/run-backend.py")
         python_path = "/usr/local/anaconda2/bin/python"
         cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn[1])
         def setpgidfn():
             os.setpgid(0, 0)
-        pp = subprocess.Popen(shlex.split(cmd), env = {'topdir': self.czcapp_top}, stdout = subprocess.PIPE) # , preexec_fn = setpgidfn)
+        pp = subprocess.Popen(shlex.split(cmd), env = {'topdir': self.dplapp_top}, stdout = subprocess.PIPE) # , preexec_fn = setpgidfn)
         pgid = os.getpgid(os.getpid())
         print "pgid, pid", pgid, os.getpid()
         print "be pgid, pid", os.getpgid(pp.pid), pp.pid
@@ -63,10 +63,10 @@ def check_versions():
     assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
 
 if __name__ == '__main__':
-    czcapp_top = sys.argv[1]
+    dplapp_top = sys.argv[1]
     check_versions()
 
-    backend = Backend(czcapp_top)
+    backend = Backend(dplapp_top)
     backend.run_backend()    
     
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
@@ -76,14 +76,14 @@ if __name__ == '__main__':
     }
     cef.Initialize()
 
-    url = "file://" + os.path.join(os.path.expanduser(czcapp_top), "frontend/index.html")
+    url = "file://" + os.path.join(os.path.expanduser(dplapp_top), "frontend/index.html")
     print "URL:", url
     browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
     backend.browser = browser
 
     # see also https://github.com/cztomczak/cefpython/blob/master/examples/snippets/javascript_bindings.py
     bindings = cef.JavascriptBindings()
-    bindings.SetFunction("czc_getBackendPort", backend.JS_get_backend_port)
+    bindings.SetFunction("dpl_getBackendPort", backend.JS_get_backend_port)
     browser.SetJavascriptBindings(bindings)
 
     #ipdb.set_trace()
