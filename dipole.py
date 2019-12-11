@@ -26,7 +26,7 @@ class Backend:
     def backend_thread(self):
         self.xfn = tempfile.mkstemp()
         backend_path = os.path.join(self.dplapp_top, "backend/run-backend.py")
-        python_path = "/usr/local/anaconda2/bin/python"
+        python_path = sys.executable
         cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn[1])
         def setpgidfn():
             os.setpgid(0, 0)
