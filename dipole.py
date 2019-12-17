@@ -16,14 +16,10 @@ class Backend:
 
     def JS_get_backend_port(self, js_value, js_callback):
         print "Backend::JS_get_backend_port: js_value:", js_value
+        print "found port:", self.backend_port
         js_callback.Call(self.backend_port, None)
 
     def run_backend(self):
-        self.t1 = threading.Thread(target = self.backend_thread)
-        self.t1.daemon = True
-        self.t1.start()
-        
-    def backend_thread(self):
         self.xfn = tempfile.mkstemp()
         backend_path = os.path.join(self.dplapp_top, "backend/run-backend.py")
         python_path = sys.executable
@@ -39,11 +35,18 @@ class Backend:
 
         #ipdb.set_trace()
         lines = pp.stdout.readline()
+        print lines
 
-        self.backend_port = int(open(self.xfn[1]).read())
-        print "backend port:", self.backend_port
+        while self.backend_port is None:
+            self.backend_port = int(open(self.xfn[1]).read())
+            print "backend port:", self.backend_port
         os.unlink(self.xfn[1])            
-
+        
+        self.t1 = threading.Thread(target = self.backend_thread)
+        self.t1.daemon = True
+        self.t1.start()
+        
+    def backend_thread(self):
         print "WAITING"
         pp.wait()
         print "WAITING DONE"
