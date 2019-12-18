@@ -6,18 +6,15 @@ from topdir import topdir
 def install_cmds(top):
     cmds = []
     cmds.append("cd {top}/frontend && npm install".format(top = top))
-    cmds.append("cd {top}/frontend && mkdir gen-js".format(top = top))
     return cmds
 
 def build_cmds(top):
     dd = {}
     dd["top"] = top
-    dd["slice2js"] = "./node_modules/slice2js/build/Release/slice2js"
-    dd["ice_slice_dir"] = "./node_modules/slice2js/ice/slice"
     dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"
 
     cmds = []
-    cmds.append("cd {top}/frontend && {slice2js} --output-dir gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
+    #cmds.append("cd {top}/frontend && {slice2js} --output-dir gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 

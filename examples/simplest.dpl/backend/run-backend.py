@@ -1,11 +1,15 @@
-#import ipdb
+import ipdb
 import sys, os
 import prctl, signal
+from flask import Flask
+from flask_socketio import SocketIO, emit
+import json, time
 
-if not 'topdir' in os.environ:
-    raise Exception("no topdir specified in env")
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
-@dipole.exportclass
+#@dipole.exportclass
 class Hello:
     def sayHello(self):
         print "Hello World!"
@@ -13,31 +17,55 @@ class Hello:
 
     def sayAloha(self, language):
         print "Aloha"
-        return "Aloha"
+
+class Dispatcher:
+    def __init__(self):
+        self.objects = {}
+
+    def add_object(self, object_id, obj):
+        self.objects[object_id] = obj
+
+dispatcher = Dispatcher()
+        
+@socketio.on('connect')
+def on_connect():
+    print('user connected')    
+    #emit('topics', {'/status': 'INIT'}, broadcast=True)
+
+@socketio.on('remote-call')
+def on_remote_call(call_args):
+    print 'on_remote_call:', call_args
+    #ipdb.set_trace()
+    object_id = call_args['obj_id']
+    method = call_args['call_method']
+    args = call_args['args']
+    
+    obj = dispatcher.objects[object_id]
+    #print "obj:", obj
+    b_method = getattr(obj, method)
+    #print b_method
+    ret = b_method(**args)
+    print "ret:", ret
+    #ret = exec(obj.method(args))
+
+    socketio.emit('remote-call-response', {'ret': ret})
     
 if __name__ == "__main__":
-    # https://github.com/seveas/python-prctl -- prctl wrapper module
-    # more on pdeathsignal: https://stackoverflow.com/questions/284325/how-to-make-child-process-die-after-parent-exits
-    prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
+    port = 8080
+    if 0:
+        # https://github.com/seveas/python-prctl -- prctl wrapper module
+        # more on pdeathsignal: https://stackoverflow.com/questions/284325/how-to-make-child-process-die-after-parent-exits
+        prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
 
-    with Ice.initialize() as communicator:
         xfn_fn = sys.argv[1]
-
-        # server
-        port = 0
-        adapter = communicator.createObjectAdapterWithEndpoints("", "ws -p {port}".format(port = port))
-        endpoints = adapter.getEndpoints()
-        ep_s = endpoints[0].toString()
-        print ep_s
-        port = int(ep_s.split(" ")[2])
         print "running server at port", port
         xfn_fd = open(xfn_fn, "w+b")
         print >>xfn_fd, port
         xfn_fd.close()
-        print "port assigned"
         sys.stdout.flush()
 
-        adapter.add(HelloI(), Ice.stringToIdentity("hello"))
-        adapter.activate()
-        communicator.waitForShutdown()
-
+    print "adding object Hello"
+    dispatcher.add_object("Hello", Hello())
+    
+    # server
+    socketio.run(app, host = "localhost", port = port, debug = True)
