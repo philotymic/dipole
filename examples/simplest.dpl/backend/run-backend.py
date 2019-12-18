@@ -17,6 +17,7 @@ class Hello:
 
     def sayAloha(self, language):
         print "Aloha"
+        return language + "Ahoha"
 
 class Dispatcher:
     def __init__(self):
@@ -36,19 +37,18 @@ def on_connect():
 def on_remote_call(call_args):
     print 'on_remote_call:', call_args
     #ipdb.set_trace()
+    call_id = call_args['call_id']
     object_id = call_args['obj_id']
     method = call_args['call_method']
     args = call_args['args']
     
     obj = dispatcher.objects[object_id]
-    #print "obj:", obj
     b_method = getattr(obj, method)
-    #print b_method
+    ret = None; exc = None
     ret = b_method(**args)
-    print "ret:", ret
-    #ret = exec(obj.method(args))
+    print "ret:", ret, call_id
 
-    socketio.emit('remote-call-response', {'ret': ret})
+    socketio.emit('remote-call-response', {'call_id': call_id, 'ret': ret})
     
 if __name__ == "__main__":
     port = 8080
