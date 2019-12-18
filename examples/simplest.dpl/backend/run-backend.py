@@ -17,6 +17,7 @@ class Hello:
 
     def sayAloha(self, language):
         print "Aloha"
+        #time.sleep(3)
         return language + "Ahoha"
 
 class Dispatcher:
