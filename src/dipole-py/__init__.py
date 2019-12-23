@@ -1,4 +1,4 @@
-from myws import *
+from dipole import *
 import json
 
 def exportclass(cls):
@@ -30,9 +30,9 @@ class Dispatcher:
 
         return {'call_return': ret, 'call_id': call_id}
         
-class EventHandler(MyWSEventHandler):
+class BackendEventHandler(DipoleEventHandler):
     def __init__(self, port_assignment_handler):        
-        MyWSEventHandler.__init__(self)
+        DipoleEventHandler.__init__(self)
         self.dispatcher = None
         self.port_assignment_handler = port_assignment_handler
 
