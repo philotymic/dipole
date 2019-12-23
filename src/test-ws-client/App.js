@@ -13,7 +13,7 @@ class App extends React.Component {
     }
     
     socket_init() {
-	this.socket = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
+	this.socket = new WebSocket("ws://localhost:9001/");
 
 	this.socket.onopen = function(e) {
 	    console.log("[open] Connection established");
@@ -22,7 +22,7 @@ class App extends React.Component {
 	};
 
 	this.socket.onmessage = function(event) {
-	    console.log(`[message] Data received from server: ${event.data}`);
+	    console.log(`from server: ${event.data}`);
 	};
 
 	this.socket.onclose = function(event) {
@@ -45,7 +45,7 @@ class App extends React.Component {
 	//debugger;
 
 	console.log("Sending to server");
-	this.socket.send("My name is John");
+	this.socket.send("My name is mine");
     }
     
     render() {
