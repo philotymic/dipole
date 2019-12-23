@@ -2,9 +2,25 @@
 #include <iostream>
 using namespace std;
 
-/* This is a simple WebSocket echo server example.
- * You may compile it with "WITH_OPENSSL=1 make" or with "make" */
+#include <internal/internal.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+
+void listen_handler(us_listen_socket_t* l)
+{
+  cerr << "listen handler" << endl;
+  int sock_fd = l->s.p.state.fd;
+  struct sockaddr_in sin;
+  socklen_t len = sizeof(sin);
+  if (::getsockname(sock_fd, (sockaddr*)&sin, &len) == -1) {
+    cerr << "getsockname error" << endl;
+  } else {
+    cerr << "port: " << ::ntohs(sin.sin_port) << endl;
+  }
+}
+    
 int main() {
     /* ws->getUserData returns one of these */
     struct PerSocketData {
@@ -43,9 +59,9 @@ int main() {
         .close = [](auto *ws, int code, std::string_view message) {
             /* You may access ws->getUserData() here */
         }
-    }).listen(9001, [](auto *token) {
+    }).listen(0, listen_handler/*[](auto *token) {
         if (token) {
             std::cout << "Listening on port " << 9001 << std::endl;
         }
-    }).run();
+	}*/).run();
 }
