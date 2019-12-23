@@ -39,7 +39,7 @@ class Backend:
 
         while self.backend_port is None:
             self.backend_port = int(open(self.xfn[1]).read())
-            print "backend port:", self.backend_port
+            print "dipole runner backend port:", self.backend_port
         os.unlink(self.xfn[1])            
         
         self.t1 = threading.Thread(target = self.backend_thread)
@@ -47,10 +47,6 @@ class Backend:
         self.t1.start()
         
     def backend_thread(self):
-        print "WAITING"
-        pp.wait()
-        print "WAITING DONE"
-
         self.browser.CloseBrowser()
         
         sys.exit(0)
@@ -79,7 +75,7 @@ if __name__ == '__main__':
     }
     cef.Initialize()
 
-    url = "file://" + os.path.join(os.path.expanduser(dplapp_top), "frontend/index.html")
+    url = "file://" + os.path.join(os.path.abspath(os.path.expanduser(dplapp_top)), "frontend/index.html")
     print "URL:", url
     browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
     backend.browser = browser
