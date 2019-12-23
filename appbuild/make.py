@@ -11,10 +11,11 @@ def install_cmds(top):
 def build_cmds(top):
     dd = {}
     dd["top"] = top
-    dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"
+    dd["dipole_jsgen"] = "python {dipole_dir}/src/dipole-jsgen.py".format(dipole_dir = ".")
+    dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"    
 
     cmds = []
-    #cmds.append("cd {top}/frontend && {slice2js} --output-dir gen-js -I{top}/backend -I{ice_slice_dir} {top}/backend/backend.ice".format(**dd))
+    cmds.append("{dipole_jsgen} {top}/frontend/gen-js {top}/backend/run-backend.py".format(**dd))
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 

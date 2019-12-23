@@ -3,10 +3,11 @@ import sys, os
 import prctl, signal
 import json, time
 
-sys.path.append("/home/asmirnov/dipole/src/myws")
+sys.path.append("/home/asmirnov/dipole/src")
 import myws
 
 #@dipole.exportclass
+@myws.exportclass
 class Hello:
     def sayHello(self):
         print "Hello World!"

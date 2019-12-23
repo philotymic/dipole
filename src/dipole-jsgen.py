@@ -1,4 +1,4 @@
-import ipdb
+import sys, os
 import ast
 
 class JSClassDef:
@@ -14,10 +14,13 @@ class JSClassMethodDef:
 
 js_classes = []
 
-def generate_js_file():
+def generate_js_file(out_dir):
     for js_class in js_classes:
-        print "class", js_class.class_name + "Prx", "{"
-        print """
+        prx_class_name = js_class.class_name + "Prx"
+        out_fd = open(os.path.join(out_dir, prx_class_name + ".js"), "w")
+
+        print >>out_fd, "class", prx_class_name, "{"
+        print >>out_fd, """
         constructor(communicator, remote_obj_id) {
           this.communicator = communicator;
           this.remote_obj_id = remote_obj_id;
@@ -25,10 +28,10 @@ def generate_js_file():
         """
         for js_method in js_class.methods:
             method_args_l = filter(lambda x: x != 'self', js_method.method_args)
-            print "        ",
-            print js_method.method_name, "(", ",".join(method_args_l), ") {"
+            print >>out_fd, "        ",
+            print >>out_fd, js_method.method_name, "(", ",".join(method_args_l), ") {"
             method_args_l = ["'%s': %s" % (arg, arg) for arg in js_method.method_args if arg != 'self']
-            print """
+            print >>out_fd, """
             let args = {'obj_id': this.remote_obj_id,
 	                'call_method': '%s',
 		        'args': {%s}};
@@ -36,8 +39,9 @@ def generate_js_file():
             }
             """ % (js_method.method_name, ",".join(method_args_l))
             
-        print "};"
-        print "export default", js_class.class_name + "Prx;"
+        print >>out_fd, "};"
+        print >>out_fd, "export default", prx_class_name, ";"
+        out_fd.close()
         
 
 def handle_dipole_export_class(ast_node):
@@ -56,7 +60,10 @@ def handle_dipole_export_class(ast_node):
     js_classes.append(js_class)
 
 if __name__ == "__main__":
-    source_code = "\n".join(open("./run-backend.py").readlines())
+    out_dir = sys.argv[1]
+    py_fn = sys.argv[2]
+
+    source_code = "\n".join(open(py_fn).readlines())
     #print source_code[:100]
     pt = ast.parse(source_code)
     #print ast.dump(pt)
@@ -78,4 +85,6 @@ if __name__ == "__main__":
 
     print "walk is done"
     print js_classes
-    generate_js_file()
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    generate_js_file(out_dir)
