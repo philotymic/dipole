@@ -3,7 +3,7 @@
 #ifndef __MYWS_HH__
 #define __MYWS_HH__
 
-#include <memory>
+#include <string>
 using namespace std;
 
 class MyWSEventHandler {
