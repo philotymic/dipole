@@ -1,13 +1,13 @@
 import example
 
-callback = example.Callback()
-example.setCallback(callback)
-example.doSomeWithCallback()
+#callback = example.Callback()
+#example.setCallback(callback)
+#example.doSomeWithCallback()
 
-class Callback(example.Callback):
+class PyCallback(example.Callback):
     def run(self, n):
         print 'This print from Python: n =', n
 
-callback = Callback()
-example.setCallback(callback)
+py_callback = PyCallback()
+example.setCallback(py_callback)
 example.doSomeWithCallback()
