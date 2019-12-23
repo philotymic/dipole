@@ -4,7 +4,7 @@
 class Callback{
 public:
   virtual void run(int n) = 0;
-  virtual ~Callback() {}; 
+  virtual ~Callback() = 0; 
 };   
 
 class CallBacker {

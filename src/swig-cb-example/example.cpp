@@ -1,6 +1,10 @@
 #include <iostream>
 #include "example.h"
 
+Callback::~Callback()
+{
+}
+
 int n = 0;
 
 void CallBacker::setCallback(Callback * cb)
