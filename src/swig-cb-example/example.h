@@ -3,7 +3,7 @@
 
 class Callback{
 public:
-  virtual void run(int n);
+  virtual void run(int n) = 0;
   virtual ~Callback() {}; 
 };   
 

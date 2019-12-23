@@ -3,11 +3,6 @@
 
 int n = 0;
 
-void Callback::run(int n)
-{ 
-  std::cout << "This print from C++: n = " << n << std::endl;
-}   
-
 void CallBacker::setCallback(Callback * cb)
 {
   callback = cb; 
