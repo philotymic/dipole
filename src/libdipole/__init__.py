@@ -1,5 +1,6 @@
 from libdipole import *
 import json
+import sys
 
 def exportclass(cls):
     print "decorator"
@@ -31,14 +32,15 @@ class Dispatcher:
         return {'call_return': ret, 'call_id': call_id}
         
 class BackendEventHandler(DipoleEventHandler):
-    def __init__(self, port_assignment_handler):        
+    def __init__(self, port_assignment_handler, xfn_fn):        
         DipoleEventHandler.__init__(self)
         self.dispatcher = None
         self.port_assignment_handler = port_assignment_handler
+        self.xfn_fn = xfn_fn
 
     def on_port_assignment(self, assigned_port):
         print "assigned port:", assigned_port
-        self.port_assignment_handler(assigned_port)
+        self.port_assignment_handler(assigned_port, self.xfn_fn)
         
     def on_connect(self):
         print "on_connect"
@@ -52,3 +54,11 @@ class BackendEventHandler(DipoleEventHandler):
             message_action_ret = self.dispatcher.do_message_action(call_args)
         print "message_action_ret:", message_action_ret
         return json.dumps(message_action_ret)
+
+def port_assignment_handler(assigned_port, xfn_fn):
+    print "running server at port", assigned_port
+    xfn_fd = open(xfn_fn, "w+b")
+    print >>xfn_fd, assigned_port
+    xfn_fd.close()
+    sys.stdout.flush()
+        

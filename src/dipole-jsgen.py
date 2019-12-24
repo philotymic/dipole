@@ -26,7 +26,7 @@ def generate_js_file(out_dir):
           this.remote_obj_id = remote_obj_id;
         }
         """
-        for js_method in js_class.methods:
+        for js_method in filter(lambda x: x.method_name != "__init__", js_class.methods):
             method_args_l = filter(lambda x: x != 'self', js_method.method_args)
             print >>out_fd, "        ",
             print >>out_fd, js_method.method_name, "(", ",".join(method_args_l), ") {"
@@ -42,7 +42,6 @@ def generate_js_file(out_dir):
         print >>out_fd, "};"
         print >>out_fd, "export default", prx_class_name, ";"
         out_fd.close()
-        
 
 def handle_dipole_export_class(ast_node):
     print "class:", ast_node.name
@@ -75,7 +74,7 @@ if __name__ == "__main__":
                 continue
             found_dipole_export_class = False
             for decorator in decorators:
-                if decorator.value.id in ["dipole","myws"] and decorator.attr == "exportclass":
+                if decorator.value.id == "libdipole" and decorator.attr == "exportclass":
                     found_dipole_export_class = True
                     break;
 
