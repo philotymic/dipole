@@ -8,8 +8,9 @@ import tempfile
 import subprocess, shlex, threading
 
 class Backend:
-    def __init__(self, dplapp_top):
+    def __init__(self, dplapp_top, dipole_top):
         self.dplapp_top = dplapp_top
+        self.dipole_top = dipole_top
         self.backend_port = None
         self.xfn = None # TemporaryFile object, used to return port number assigned by backend
         self.browser = None
@@ -26,7 +27,10 @@ class Backend:
         cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn[1])
         def setpgidfn():
             os.setpgid(0, 0)
-        pp = subprocess.Popen(shlex.split(cmd), env = {'topdir': self.dplapp_top}, stdout = subprocess.PIPE) # , preexec_fn = setpgidfn)
+        pp = subprocess.Popen(shlex.split(cmd),
+                              stdout = subprocess.PIPE,
+                              env = {'topdir': self.dplapp_top,
+                                     'dipole_topdir': self.dipole_top})
         pgid = os.getpgid(os.getpid())
         print "pgid, pid", pgid, os.getpid()
         print "be pgid, pid", os.getpgid(pp.pid), pp.pid
@@ -62,10 +66,11 @@ def check_versions():
     assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
 
 if __name__ == '__main__':
+    dipole_top = os.path.abspath(os.path.dirname(sys.argv[0]))
     dplapp_top = sys.argv[1]
     check_versions()
 
-    backend = Backend(dplapp_top)
+    backend = Backend(dplapp_top, dipole_top)
     backend.run_backend()    
     
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error

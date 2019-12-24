@@ -3,7 +3,7 @@ import sys, os
 import prctl, signal
 import time
 
-sys.path.append("/home/asmirnov/dipole/src")
+sys.path.append(os.path.join(os.environ['dipole_topdir'], "src"))
 import libdipole
 
 @libdipole.exportclass
