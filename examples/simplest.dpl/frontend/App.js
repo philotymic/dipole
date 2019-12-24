@@ -1,26 +1,6 @@
 import React from 'react';
-import Communicator from 'libdipole-js';
+import {getBackendCommunicator} from 'libdipole-js';
 import HelloPrx from './gen-js/HelloPrx.js';
-
-function getBackendPort() {
-    return new Promise((resolve, reject) => {
-        // this function is defined in python
-        dpl_getBackendPort("hello from js", (port) => {
-            if (port) {
-		resolve(port);
-            } else {
-		reject("getBackendPort returns null/undef");
-            }
-        });
-    });
-}
-
-function getBackendCommunicator() {
-    return getBackendPort().then((port) => {
-	const socket = new WebSocket(`ws://localhost:${port}`);
-	return Promise.resolve(new Communicator(socket));
-    });
-}
 
 let c = 0;
 class App extends React.Component {
