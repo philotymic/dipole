@@ -1,10 +1,14 @@
-#include "dipole_py.h"
+#include "dipolepy.h"
 #include <App.h>
 
 #include <internal/internal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+
+DipoleEventHandler::~DipoleEventHandler()
+{
+}
 
 DipoleServer::DipoleServer()
 {

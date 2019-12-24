@@ -1,13 +1,12 @@
-import ipdb
+#import ipdb
 import sys, os
 import prctl, signal
 import time
 
 sys.path.append("/home/asmirnov/dipole/src")
-import myws
+import dipolepy
 
-#@dipole.exportclass
-@myws.exportclass
+@dipolepy.exportclass
 class Hello:
     def sayHello(self):
         print "Hello World!"
@@ -32,15 +31,13 @@ if __name__ == "__main__":
         # more on pdeathsignal: https://stackoverflow.com/questions/284325/how-to-make-child-process-die-after-parent-exits
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
 
-    ws_server = myws.MyWSServer()
-    ws_event_handler = myws.EventHandler(port_assignment_handler)
-    ws_server.set_event_handler(ws_event_handler)
-    dispatcher = myws.Dispatcher(ws_server)
-    ws_event_handler.dispatcher = dispatcher
+    dpl_server = dipolepy.DipoleServer()
+    dpl_event_handler = dipolepy.BackendEventHandler(port_assignment_handler)
+    dpl_server.set_event_handler(dpl_event_handler)
+    dispatcher = dipolepy.Dispatcher(dpl_server)
+    dpl_event_handler.dispatcher = dispatcher
     
     print "adding object Hello"
     dispatcher.add_object("Hello", Hello())
 
-    ws_server.run_listener(port = 0)
-        
-    
+    dpl_server.run_listener(port = 0)

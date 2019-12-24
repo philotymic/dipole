@@ -1,4 +1,4 @@
-from dipole_py import *
+from dipolepy import *
 import json
 
 print "dipole.__init__"
