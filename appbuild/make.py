@@ -1,7 +1,6 @@
 #!/usr/bin/python -B
 #
 import os, sys
-from topdir import topdir
 
 def install_cmds(top):
     cmds = []
@@ -15,7 +14,7 @@ def build_cmds(top):
     dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"    
 
     cmds = []
-    cmds.append("{dipole_jsgen} {top}/frontend/gen-js {top}/backend/run-backend.py".format(**dd))
+    cmds.append("{dipole_jsgen} {top}/frontend/gen-js {top}/backend".format(**dd))
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 

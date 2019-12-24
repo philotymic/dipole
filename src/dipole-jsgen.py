@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, glob
 import ast
 
 class JSClassDef:
@@ -42,7 +42,7 @@ def generate_js_file(out_dir):
         print >>out_fd, "};"
         print >>out_fd, "export default", prx_class_name, ";"
         out_fd.close()
-
+        
 def handle_dipole_export_class(ast_node):
     print "class:", ast_node.name
     js_class = JSClassDef(ast_node.name)
@@ -58,10 +58,7 @@ def handle_dipole_export_class(ast_node):
 
     js_classes.append(js_class)
 
-if __name__ == "__main__":
-    out_dir = sys.argv[1]
-    py_fn = sys.argv[2]
-
+def translate_file(py_fn, out_dir):
     source_code = "\n".join(open(py_fn).readlines())
     #print source_code[:100]
     pt = ast.parse(source_code)
@@ -87,3 +84,12 @@ if __name__ == "__main__":
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     generate_js_file(out_dir)
+    
+    
+if __name__ == "__main__":
+    out_dir = sys.argv[1]
+    py_dir = sys.argv[2]
+
+    for py_fn in glob.glob(os.path.join(py_dir, "*.py")):
+        print "translate", py_fn
+        translate_file(py_fn, out_dir)
