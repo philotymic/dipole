@@ -1,7 +1,5 @@
-from dipolepy import *
+from libdipole import *
 import json
-
-print "dipole.__init__"
 
 def exportclass(cls):
     print "decorator"

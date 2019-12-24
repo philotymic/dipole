@@ -1,4 +1,4 @@
-#include "dipolepy.h"
+#include "libdipole.h"
 #include <App.h>
 
 #include <internal/internal.h>

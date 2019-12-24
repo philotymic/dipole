@@ -1,7 +1,7 @@
 // -*- c++ -*-
 //
-#ifndef __DIPOLE_PY_HH__
-#define __DIPOLE_PY_HH__
+#ifndef __LIBDIPOLE_HH__
+#define __LIBDIPOLE_HH__
 
 #include <string>
 using namespace std;
