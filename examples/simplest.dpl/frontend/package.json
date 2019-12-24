@@ -15,7 +15,7 @@
     "@babel/plugin-proposal-decorators": "^7.6.0",
     "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-react": "^7.0.0",
-    "dipole-js": "file:../../../src/dipole-js",
+    "libdipole-js": "file:../../../src/libdipole-js",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "rollup": "^1.21.3",

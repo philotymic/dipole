@@ -1,5 +1,5 @@
 import React from 'react';
-import Communicator from 'dipole-js';
+import Communicator from 'libdipole-js';
 import HelloPrx from './gen-js/HelloPrx.js';
 
 let c = 0;
