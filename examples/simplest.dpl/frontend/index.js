@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {getBackendCommunicator} from 'libdipole-js';
 import App from './App.js';
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+getBackendCommunicator().then((communicator) => {
+    ReactDOM.render(<App communicator={communicator}/>, document.getElementById('root'));
+});

@@ -5,40 +5,41 @@ function generateQuickGuid() {
 }
 
 class Communicator {
-    constructor(socket) {
-	this.socket = socket;
-	this.socket_init();
+    constructor(server_url) {
+	this.server_url = server_url;
 	this.pending_calls = new Map();
 	this.deliver_response = this.deliver_response.bind(this);
-	//this.socket.on('remote-call-response', this.deliver_response);
     }
 
-    socket_init() {
-	console.log("SOCKET_INIT called");
-	this.socket.onopen = function(e) {
-	    console.log("[open] Connection established");
-	    //console.log("Sending to server");
-	    //socket.send("My name is John");
-	};
+    connect() {
+	return new Promise((resolve, reject) => {
+	    this.socket = new WebSocket(this.server_url);
 
-	this.socket.onmessage = (event) => {
-	    //console.log(`from server: ${event.data}`);	    
-	    this.deliver_response(JSON.parse(event.data));
-	};
+	    this.socket.onopen = (e) => {
+		console.log("[open] Connection established");
+		resolve(this);
+	    };
 
-	this.socket.onclose = function(event) {
-	    if (event.wasClean) {
-		console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-	    } else {
-		// e.g. server process killed or network down
-		// event.code is usually 1006 in this case
-		console.log('[close] Connection died');
+	    this.socket.onerror = function(error) {
+		console.log(`[error] ${error.message}`);
+		reject(error);
 	    }
-	};
 
-	this.socket.onerror = function(error) {
-	    console.log(`[error] ${error.message}`);
-	};
+	    this.socket.onmessage = (event) => {
+		//console.log(`from server: ${event.data}`);	    
+		this.deliver_response(JSON.parse(event.data));
+	    };
+
+	    this.socket.onclose = function(event) {
+		if (event.wasClean) {
+		    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+		} else {
+		    // e.g. server process killed or network down
+		    // event.code is usually 1006 in this case
+		    console.log('[close] Connection died');
+		}
+	    };
+	});
     }
     
     deliver_response(res) {

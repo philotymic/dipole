@@ -15,7 +15,7 @@ function getBackendPort() {
 
 export function getBackendCommunicator() {
     return getBackendPort().then((port) => {
-	const socket = new WebSocket(`ws://localhost:${port}`);
-	return Promise.resolve(new Communicator(socket));
+	let communicator = new Communicator(`ws://localhost:${port}`);
+	return communicator.connect();
     });
 }

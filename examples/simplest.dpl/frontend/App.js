@@ -1,22 +1,20 @@
 import React from 'react';
-import {getBackendCommunicator} from 'libdipole-js';
 import HelloPrx from './gen-js/HelloPrx.js';
 
 let c = 0;
 class App extends React.Component {
     constructor(props) {
 	super(props);
+	this.hello_prx = new HelloPrx(this.props.communicator, 'Hello');
 	this.state = {greeting: 'none', greeting2: 'none'};
 	this.onClick = this.onClick.bind(this);
-	this.hello_prx = null;
     }
 
     componentDidMount() {
-	getBackendCommunicator().then((communicator) => {
-	    this.props.communicator = communicator;
-	    this.hello_prx = new HelloPrx(this.props.communicator, 'Hello');
+	this.hello_prx.sayHello().then((res) => {
+	    this.setState({...this.state, greeting: res + " first time"});
 	});
-    }
+    }	
     
     onClick() {
 	this.hello_prx.sayHello().then((res) => {
