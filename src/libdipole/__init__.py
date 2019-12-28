@@ -55,10 +55,10 @@ class BackendEventHandler(DipoleEventHandler):
         print "message_action_ret:", message_action_ret
         return json.dumps(message_action_ret)
 
-def port_assignment_handler(assigned_port, xfn_fn):
+def port_assignment_handler(assigned_port, named_pipe_fn):
     print "running server at port", assigned_port
-    xfn_fd = open(xfn_fn, "w+b")
-    print >>xfn_fd, assigned_port
-    xfn_fd.close()
-    sys.stdout.flush()
+    with open(named_pipe_fn, "w+b") as named_pipe_fd:
+        print >>named_pipe_fd, assigned_port
+
+
         

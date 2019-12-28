@@ -4,7 +4,7 @@ import ipdb
 from cefpython3 import cefpython as cef
 import platform
 import sys, os.path
-import tempfile
+import tempfile, uuid
 import subprocess, shlex, threading
 
 class Backend:
@@ -21,30 +21,21 @@ class Backend:
         js_callback.Call(self.backend_port, None)
 
     def run_backend(self):
-        self.xfn = tempfile.mkstemp()
+        self.xfn = os.path.join(tempfile.gettempdir(), str(uuid.uuid4()))
         backend_path = os.path.join(self.dplapp_top, "backend/run-backend.py")
         python_path = sys.executable
-        cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn[1])
-        def setpgidfn():
-            os.setpgid(0, 0)
+        cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn)
         pp = subprocess.Popen(shlex.split(cmd),
-                              stdout = subprocess.PIPE,
                               env = {'topdir': self.dplapp_top,
                                      'dipole_topdir': self.dipole_top})
-        pgid = os.getpgid(os.getpid())
-        print "pgid, pid", pgid, os.getpid()
-        print "be pgid, pid", os.getpgid(pp.pid), pp.pid
-        os.setpgid(0, 0) # session id -- http://www.informit.com/articles/article.aspx?p=397655&seqNum=6
-        #pp.stdout.read()
-
-        #ipdb.set_trace()
-        lines = pp.stdout.readline()
-        print lines
-
-        while self.backend_port is None:
-            self.backend_port = int(open(self.xfn[1]).read())
+        print "backend process pid:", pp.pid
+        
+        os.mkfifo(self.xfn)
+        with open(self.xfn) as xfn_fifo:
+            print "xfn fifo opened, waiting for backend to respond with port"
+            self.backend_port = int(xfn_fifo.read())
             print "dipole runner backend port:", self.backend_port
-        os.unlink(self.xfn[1])            
+        os.unlink(self.xfn)
         
         self.t1 = threading.Thread(target = self.backend_thread)
         self.t1.daemon = True
