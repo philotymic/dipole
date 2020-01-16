@@ -37,8 +37,8 @@ void DipoleServer::run_listener(int port)
 	this->event_handler->on_connect();
       },
         .message = [this](auto *ws, std::string_view message, uWS::OpCode opCode) {
-	ostringstream message_s; message_s << message;
-	string event_handler_res = this->event_handler->on_message(message_s.str().c_str());
+	string message_s(message.begin(), message.end());
+	string event_handler_res = this->event_handler->on_message(message_s.c_str());
 	cerr << "event_handler->on_message returns: " << event_handler_res << endl;
 	ws->send(event_handler_res, opCode);
 	
