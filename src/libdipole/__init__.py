@@ -15,7 +15,7 @@ class Dispatcher:
         self.objects[object_id] = obj
 
     def do_message_action(self, call_args):
-        print 'do_message_action:', call_args
+        #print 'do_message_action:', call_args
         #ipdb.set_trace()
         call_id = call_args['call_id']
         object_id = call_args['obj_id']
@@ -27,7 +27,7 @@ class Dispatcher:
         b_method = getattr(obj, method)
         ret = None; exc = None
         ret = b_method(**args)
-        print "ret:", ret, call_id
+        print "ret:", call_id
 
         return {'call_return': ret, 'call_id': call_id}
         
@@ -46,13 +46,13 @@ class BackendEventHandler(DipoleEventHandler):
         print "on_connect"
         
     def on_message(self, message):
-        print "on_message:", message, type(message), json
+        print "on_message:"
         message_json = json.loads(message)
-        print message_json, self.dispatcher
+        #print message_json, self.dispatcher
         if message_json['action'] == 'remote-call':
             call_args = message_json['action-args']
             message_action_ret = self.dispatcher.do_message_action(call_args)
-        print "message_action_ret:", message_action_ret
+        #print "message_action_ret:", message_action_ret
         return json.dumps(message_action_ret)
 
 def port_assignment_handler(assigned_port, named_pipe_fn):
