@@ -6,7 +6,7 @@ class App extends React.Component {
     constructor(props) {
 	super(props);
 	this.hello_prx = new HelloPrx(this.props.communicator, 'Hello');
-	this.state = {greeting: 'none', greeting2: 'none'};
+	this.state = {greeting: 'none', greeting2: 'none', holidays: null};
 	this.onClick = this.onClick.bind(this);
     }
 
@@ -24,6 +24,9 @@ class App extends React.Component {
 	this.hello_prx.sayAloha('hawaii').then((res) => {
 	    this.setState({...this.state, greeting2: res});
 	});
+	this.hello_prx.get_holidays().then(x => {
+	    this.setState({holidays: x});
+	});
     }
     
     render() {
@@ -31,6 +34,7 @@ class App extends React.Component {
 		<h1>Hello from modules</h1>
 		<h2>{this.state.greeting}</h2>
 		<h2>{this.state.greeting2}</h2>
+		<h2>{this.state.holidays}</h2>
 		<button onClick={this.onClick}>PRESS</button>
 	       </div>);
     }

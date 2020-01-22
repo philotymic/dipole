@@ -17,6 +17,10 @@ class Hello:
         #time.sleep(3)
         return language + "Aloha"
 
+    def get_holidays(self):
+        print "get_holidays"
+        return ["20190101", "20200101"]
+    
 if __name__ == "__main__":
     if 1:
         # https://github.com/seveas/python-prctl -- prctl wrapper module
