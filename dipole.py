@@ -15,6 +15,10 @@ class Backend:
         self.xfn = None # TemporaryFile object, used to return port number assigned by backend
         self.browser = None
 
+    def JS_get_argv(self, js_value, js_callback):
+        print "Backend::JS_get_argv"
+        js_callback.Call(sys.argv, None)
+        
     def JS_get_backend_port(self, js_value, js_callback):
         print "Backend::JS_get_backend_port: js_value:", js_value
         print "found port:", self.backend_port
@@ -78,6 +82,7 @@ if __name__ == '__main__':
 
     # see also https://github.com/cztomczak/cefpython/blob/master/examples/snippets/javascript_bindings.py
     bindings = cef.JavascriptBindings()
+    bindings.SetFunction("dpl_getArgv", backend.JS_get_argv)
     bindings.SetFunction("dpl_getBackendPort", backend.JS_get_backend_port)
     browser.SetJavascriptBindings(bindings)
 

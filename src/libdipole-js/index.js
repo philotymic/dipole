@@ -1,5 +1,15 @@
 import Communicator from './Communicator.js';
 
+export function getArgv() {
+    return new Promise((resolve, reject) => {
+	// this function is defined in python
+	dpl_getArgv(null, (argv) => {
+	    //console.log("getArgv:", argv);
+	    resolve(argv);
+	});
+    });
+}
+
 function getBackendPort() {
     return new Promise((resolve, reject) => {
         // this function is defined in python
