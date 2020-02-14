@@ -1,9 +1,9 @@
-from libdipole import *
+from . import mod_libdipole
 import json
 import sys
 
 def exportclass(cls):
-    print "decorator"
+    print("decorator")
     return cls
 
 class Dispatcher:
@@ -22,31 +22,31 @@ class Dispatcher:
         method = call_args['call_method']
         args = call_args['args']
 
-        print "looking up obj", object_id
+        print("looking up obj", object_id)
         obj = self.objects[object_id]
         b_method = getattr(obj, method)
         ret = None; exc = None
         ret = b_method(**args)
-        print "ret:", call_id
+        print("ret:", call_id)
 
         return {'call_return': ret, 'call_id': call_id}
-        
-class BackendEventHandler(DipoleEventHandler):
+
+class BackendEventHandler(mod_libdipole.DipoleEventHandler):
     def __init__(self, port_assignment_handler, xfn_fn):        
-        DipoleEventHandler.__init__(self)
+        mod_libdipole.DipoleEventHandler.__init__(self)
         self.dispatcher = None
         self.port_assignment_handler = port_assignment_handler
         self.xfn_fn = xfn_fn
 
     def on_port_assignment(self, assigned_port):
-        print "assigned port:", assigned_port
+        print("assigned port:", assigned_port)
         self.port_assignment_handler(assigned_port, self.xfn_fn)
         
     def on_connect(self):
-        print "on_connect"
+        print("on_connect")
         
     def on_message(self, message):
-        print "on_message:"
+        print("on_message:")
         message_json = json.loads(message)
         #print message_json, self.dispatcher
         if message_json['action'] == 'remote-call':
@@ -56,9 +56,7 @@ class BackendEventHandler(DipoleEventHandler):
         return json.dumps(message_action_ret)
 
 def port_assignment_handler(assigned_port, named_pipe_fn):
-    print "running server at port", assigned_port
-    with open(named_pipe_fn, "w+b") as named_pipe_fd:
-        print >>named_pipe_fd, assigned_port
-
-
+    print("running server at port", assigned_port, named_pipe_fn)
+    with open(named_pipe_fn, "w") as named_pipe_fd:
+        print(assigned_port, file = named_pipe_fd)
         

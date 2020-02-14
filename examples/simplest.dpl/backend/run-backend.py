@@ -9,16 +9,16 @@ import libdipole
 @libdipole.exportclass
 class Hello:
     def sayHello(self):
-        print "Hello World!"
+        print("Hello World!")
         return "Hello, World!"
 
     def sayAloha(self, language):
-        print "Aloha"
+        print("Aloha")
         #time.sleep(3)
         return language + "Aloha"
 
     def get_holidays(self):
-        print "get_holidays"
+        print("get_holidays")
         return ["20190101", "20200101"]
     
 if __name__ == "__main__":
@@ -27,13 +27,13 @@ if __name__ == "__main__":
         # more on pdeathsignal: https://stackoverflow.com/questions/284325/how-to-make-child-process-die-after-parent-exits
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
 
-    dpl_server = libdipole.DipoleServer()
+    dpl_server = libdipole.mod_libdipole.DipoleServer()
     dpl_event_handler = libdipole.BackendEventHandler(libdipole.port_assignment_handler, sys.argv[1])
     dpl_server.set_event_handler(dpl_event_handler)
     dispatcher = libdipole.Dispatcher(dpl_server)
     dpl_event_handler.dispatcher = dispatcher
     
-    print "adding object Hello"
+    print("adding object Hello")
     dispatcher.add_object("Hello", Hello())
 
-    dpl_server.run_listener(port = 0)
+    dpl_server.run_listener(0)

@@ -16,12 +16,12 @@ class Backend:
         self.browser = None
 
     def JS_get_argv(self, js_value, js_callback):
-        print "Backend::JS_get_argv"
+        print("Backend::JS_get_argv")
         js_callback.Call(sys.argv, None)
         
     def JS_get_backend_port(self, js_value, js_callback):
-        print "Backend::JS_get_backend_port: js_value:", js_value
-        print "found port:", self.backend_port
+        print("Backend::JS_get_backend_port: js_value:", js_value)
+        print("found port:", self.backend_port)
         js_callback.Call(self.backend_port, None)
 
     def run_backend(self):
@@ -32,13 +32,13 @@ class Backend:
         pp = subprocess.Popen(shlex.split(cmd),
                               env = {'topdir': self.dplapp_top,
                                      'dipole_topdir': self.dipole_top})
-        print "backend process pid:", pp.pid
+        print("backend process pid:", pp.pid)
         
         os.mkfifo(self.xfn)
         with open(self.xfn) as xfn_fifo:
-            print "xfn fifo opened, waiting for backend to respond with port"
+            print("xfn fifo opened, waiting for backend to respond with port")
             self.backend_port = int(xfn_fifo.read())
-            print "dipole runner backend port:", self.backend_port
+            print("dipole runner backend port:", self.backend_port)
         os.unlink(self.xfn)
         
         self.t1 = threading.Thread(target = self.backend_thread)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     cef.Initialize()
 
     url = "file://" + os.path.join(os.path.abspath(os.path.expanduser(dplapp_top)), "frontend/index.html")
-    print "URL:", url
+    print("URL:", url)
     browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
     backend.browser = browser
 

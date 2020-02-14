@@ -1,5 +1,3 @@
-#!/usr/bin/python -B
-#
 import os, sys
 
 def install_cmds(top):
@@ -40,9 +38,9 @@ if __name__ == "__main__":
         raise Exception("unknown action %s" % action)
 
     for cmd in cmds:
-        print "CMD:", cmd
+        print("CMD:", cmd)
         e_code = os.system(cmd)
         if e_code != 0:
-            print "command failed"
+            print("command failed")
             break
     

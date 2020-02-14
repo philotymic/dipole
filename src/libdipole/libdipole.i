@@ -1,4 +1,4 @@
-%module(directors="1") libdipole
+%module(directors="1") mod_libdipole
 %{
 #include "libdipole.h"
 %}
