@@ -14,10 +14,9 @@ class Dispatcher:
     def add_object(self, object_id, obj):
         self.objects[object_id] = obj
 
-    def do_message_action(self, call_args):
-        #print 'do_message_action:', call_args
+    def do_message_action(self, call_id, call_args):
+        print('do_message_action:', call_args)
         #ipdb.set_trace()
-        call_id = call_args['call_id']
         object_id = call_args['obj_id']
         method = call_args['call_method']
         args = call_args['args']
@@ -26,7 +25,8 @@ class Dispatcher:
         obj = self.objects[object_id]
         b_method = getattr(obj, method)
         ret = None; exc = None
-        ret = b_method(**args)
+        args_d = json.loads(args)
+        ret = b_method(**args_d)
         print("ret:", call_id)
 
         return {'call_return': ret, 'call_id': call_id}
@@ -51,7 +51,8 @@ class BackendEventHandler(mod_libdipole.DipoleEventHandler):
         #print message_json, self.dispatcher
         if message_json['action'] == 'remote-call':
             call_args = message_json['action-args']
-            message_action_ret = self.dispatcher.do_message_action(call_args)
+            call_id = message_json['call_id']
+            message_action_ret = self.dispatcher.do_message_action(call_id, call_args)
         #print "message_action_ret:", message_action_ret
         return json.dumps(message_action_ret)
 
