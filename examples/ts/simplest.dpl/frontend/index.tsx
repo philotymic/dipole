@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import {getBackendCommunicator} from 'libdipole-js';
 import {getBackendCommunicator, Communicator} from './Communicator';
 import App from './App';
 
