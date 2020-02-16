@@ -52,18 +52,26 @@ class Communicator {
 	// or reject(res) if res is actually remote exception
     }
     
-    do_call(args) {
+    do_call(call_req) {
 	return new Promise((resolve, reject) => {
 	    if (this.pending_calls.size > 1) {
 		console.error("this.pending_calls is too big");
 	    }
-	    args = {...args, 'call_id': generateQuickGuid()};
-	    let pending_call_args = {...args, 'promise_cbs': [resolve, reject]};
-	    this.pending_calls.set(pending_call_args['call_id'], pending_call_args);
+	    let call_o = {
+		call_request: call_req,
+		call_id: generateQuickGuid(),
+		promise_cbs: [resolve, reject]
+	    };
+	    this.pending_calls.set(call_o.call_id, call_o);
 
-	    let call_message = JSON.stringify({'action': 'remote-call', 'action-args': args});
-	    console.log("socket.send, call_id:", args['call_id']);
-	    this.socket.send(call_message)
+	    let call_message = {
+		'call_id': call_o.call_id,
+		'action': 'remote-call',
+		'action-args': call_o.call_request
+	    };
+	    console.log("socket.send, call_id:", call_o.call_id);
+	    console.log("socket.send:", call_message);	    
+	    this.socket.send(JSON.stringify(call_message));
 	});
     };
 };

@@ -19,14 +19,13 @@ class Dispatcher:
         #ipdb.set_trace()
         object_id = call_args['obj_id']
         method = call_args['call_method']
-        args = call_args['args']
+        args = json.loads(call_args['args'])
 
         print("looking up obj", object_id)
         obj = self.objects[object_id]
         b_method = getattr(obj, method)
         ret = None; exc = None
-        args_d = json.loads(args)
-        ret = b_method(**args_d)
+        ret = b_method(**args)
         print("ret:", call_id)
 
         return {'call_return': ret, 'call_id': call_id}

@@ -33,10 +33,10 @@ def generate_js_file(out_dir):
             print(js_method.method_name, "(", ",".join(method_args_l), ") {", file = out_fd)
             method_args_l = ["'%s': %s" % (arg, arg) for arg in js_method.method_args if arg != 'self']
             print("""
-            let args = {'obj_id': this.remote_obj_id,
-	                'call_method': '%s',
-		        'args': {%s}};
-	    return this.communicator.do_call(args);
+            let call_req = {'obj_id': this.remote_obj_id,
+	                    'call_method': '%s',
+		            'args': JSON.stringify({%s})};
+	    return this.communicator.do_call(call_req).then((ret) => {return ret});
             }
             """ % (js_method.method_name, ",".join(method_args_l)), file = out_fd)
             
@@ -83,6 +83,7 @@ def translate_file(py_fn, out_dir):
 
     print("walk is done")
     print(js_classes)
+    print("out_dir:", out_dir)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     generate_js_file(out_dir)

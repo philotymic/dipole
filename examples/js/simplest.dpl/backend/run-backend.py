@@ -6,6 +6,37 @@ import time
 sys.path.append(os.path.join(os.environ['dipole_topdir'], "src"))
 import libdipole
 
+#@libdipole.interface
+"""
+class SomethingHappen:
+    def when_something_happen(self, what_happen): pass
+
+class SomethingHappenPrx(SomethingHappen):
+    def when_something_happen(self, what_happen):
+        call_o = ...
+        call_o.call_id = ...
+        call_o.object_id = ...
+        call_o.method = 'when_something_happen'
+        call_o.args = JSON.parse(what_happen)
+        self.communicator.do_call(call_o)
+        res = self.communicator.wait_for_response(call_o.call_id)
+        return res
+
+def monitor_thread():
+    i = 0
+    while 1:
+        SERVER_CB.when_something_happen("hello" + str(i))
+        time.sleep(2)
+
+"""
+
+#@libdipole.interface
+#class Hello:
+#    def sayHello(self): pass
+#    def sayAloha(self, language): pass
+#    def get_holidays(self): pass
+#    
+#class HelloI(Hello):
 @libdipole.exportclass
 class Hello:
     def sayHello(self):
@@ -20,7 +51,7 @@ class Hello:
     def get_holidays(self):
         print("get_holidays")
         return ["20190101", "20200101"]
-    
+            
 if __name__ == "__main__":
     if 1:
         # https://github.com/seveas/python-prctl -- prctl wrapper module
