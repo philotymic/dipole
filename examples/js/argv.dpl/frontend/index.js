@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {getArgv, getBackendCommunicator} from 'libdipole-js';
+import {getArgv, connectToBackend} from 'libdipole-js';
 import ArgvPrx from "./gen-js/ArgvPrx.js";
 
 class App extends React.Component {
     constructor(props) {
 	super(props);
-	this.test_prx = new ArgvPrx(this.props.communicator, "Argv");
+	this.test_prx = new ArgvPrx(this.props.obj_client, "Argv");
 	this.state = {test_response: null};
     }
 
@@ -27,7 +27,7 @@ let argv = null;
 getArgv().then((argv_) => {
     argv = argv_;
 }).then(() => {
-    return getBackendCommunicator();
-}).then((communicator) => {
-    ReactDOM.render(<App communicator={communicator} argv={argv}/>, document.getElementById('root'));
+    return connectToBackend();
+}).then((obj_client) => {
+    ReactDOM.render(<App obj_client={obj_client} argv={argv}/>, document.getElementById('root'));
 });

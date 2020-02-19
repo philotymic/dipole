@@ -4,7 +4,7 @@ function generateQuickGuid() {
         Math.random().toString(36).substring(2, 15);
 }
 
-class Communicator {
+class ObjectClient {
     constructor(server_url) {
 	this.server_url = server_url;
 	this.pending_calls = new Map();
@@ -76,4 +76,4 @@ class Communicator {
     };
 };
 
-export default Communicator;
+export default ObjectClient;

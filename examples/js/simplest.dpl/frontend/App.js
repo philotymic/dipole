@@ -1,28 +1,11 @@
 import React from 'react';
 import HelloPrx from './gen-js/HelloPrx.js';
-//import SomethingHappen from './gen-js/SomethingHappen.js';
-
-/*
-class SomethingHappen {
-    when_something_happen(what_happen) {
-	throw new Error("not implemented");
-    }
-};
-
-class SomethingHappenI extends SomethingHappen {
-    when_something_happen(what_happen) {
-	console.log("SomethingHappenI::when_something_happen:", what_happen);
-    }
-};
-*/
 
 let c = 0;
 class App extends React.Component {
     constructor(props) {
 	super(props);
-	this.hello_prx = new HelloPrx(this.props.communicator, 'Hello');
-	//let somethinghappeni = new SomethingHappenI(this.props.communicator);
-	//this.props.communicator.add_object("SOMETHING_CB", somethinghappeni);
+	this.hello_prx = new HelloPrx(this.props.obj_client, 'Hello');
 	this.state = {greeting: 'none', greeting2: 'none', holidays: null};
 	this.onClick = this.onClick.bind(this);
     }

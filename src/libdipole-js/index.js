@@ -1,4 +1,4 @@
-import Communicator from './Communicator.js';
+import ObjectClient from './ObjectClient.js';
 
 export function getArgv() {
     return new Promise((resolve, reject) => {
@@ -23,9 +23,9 @@ function getBackendPort() {
     });
 }
 
-export function getBackendCommunicator() {
+export function connectToBackend() {
     return getBackendPort().then((port) => {
-	let communicator = new Communicator(`ws://localhost:${port}`);
-	return communicator.connect();
+	let object_client = new ObjectClient(`ws://localhost:${port}`);
+	return object_client.connect();
     });
 }

@@ -22,8 +22,8 @@ def generate_js_file(out_dir):
 
         print("class", prx_class_name, "{", file = out_fd)
         print("""
-        constructor(communicator, remote_obj_id) {
-          this.communicator = communicator;
+        constructor(obj_client, remote_obj_id) {
+          this.obj_client = obj_client;
           this.remote_obj_id = remote_obj_id;
         }
         """, file = out_fd)
@@ -36,7 +36,7 @@ def generate_js_file(out_dir):
             let call_req = {'obj_id': this.remote_obj_id,
 	                    'call_method': '%s',
 		            'args': JSON.stringify({%s})};
-	    return this.communicator.do_call(call_req).then((ret) => {return ret});
+	    return this.obj_client.do_call(call_req).then((ret) => {return ret});
             }
             """ % (js_method.method_name, ",".join(method_args_l)), file = out_fd)
             
