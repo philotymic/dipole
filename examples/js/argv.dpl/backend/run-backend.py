@@ -20,16 +20,12 @@ if __name__ == "__main__":
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
 
     xfn = sys.argv[1]
-    
-    dispatcher = libdipole.Dispatcher()
-    dpl_server = libdipole.DipoleServer(dispatcher)
-
+    o_server = libdipole.ObjectServer()
     print("adding object Argv")
-    dispatcher.add_object("Argv", Argv())
+    o_server.add_object("Argv", Argv())
 
-    dpl_server_l = websockets.serve(dpl_server.message_loop, 'localhost', 0)
-    asyncio.get_event_loop().run_until_complete(dpl_server_l)
-    assigned_port = libdipole.autoport.find_ws_port(dpl_server_l)
-    print("assigned_port:", assigned_port)
-    libdipole.port_assignment_handler(assigned_port, xfn)
+    o_server_l = websockets.serve(o_server.message_loop, 'localhost', 0)
+    asyncio.get_event_loop().run_until_complete(o_server_l)
+    assigned_port = libdipole.autoport.find_ws_port(o_server_l)
+    libdipole.__save_assigned_port(assigned_port, xfn)
     asyncio.get_event_loop().run_forever()

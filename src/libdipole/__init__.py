@@ -4,7 +4,13 @@ def exportclass(cls):
     print("decorator")
     return cls
 
-class Dispatcher:
+
+def __save_assigned_port(assigned_port, named_pipe_fn):
+    print("running server at port", assigned_port, named_pipe_fn)
+    with open(named_pipe_fn, "w") as named_pipe_fd:
+        print(assigned_port, file = named_pipe_fd)
+
+class ObjectServer:
     def __init__(self):
         self.objects = {}
 
@@ -26,24 +32,14 @@ class Dispatcher:
         print("ret:", call_id)
 
         return {'call_return': ret, 'call_id': call_id}
-
-class DipoleServer:
-    def __init__(self, dispatcher):
-        self.dispatcher = dispatcher
-
+        
     async def message_loop(self, ws, path):
         async for message in ws:
             print("async on_message:", message)
             message_json = json.loads(message)
-            #print message_json, self.dispatcher
             if message_json['action'] == 'remote-call':
                 call_args = message_json['action-args']
                 call_id = message_json['call_id']
-                message_action_ret = self.dispatcher.do_message_action(call_id, call_args)
+                message_action_ret = self.do_message_action(call_id, call_args)
             print("message_action_ret:", message_action_ret)
             await ws.send(json.dumps(message_action_ret))
-
-def port_assignment_handler(assigned_port, named_pipe_fn):
-    print("running server at port", assigned_port, named_pipe_fn)
-    with open(named_pipe_fn, "w") as named_pipe_fd:
-        print(assigned_port, file = named_pipe_fd)
