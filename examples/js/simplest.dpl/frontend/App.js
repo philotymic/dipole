@@ -1,20 +1,6 @@
 import React from 'react';
 import HelloPrx from './gen-js/HelloPrx.js';
 
-class CountUp
-{
-    constuctor(app) {
-	this.app = app;
-	this.countup = 0;
-    }
-	
-    do_one_count_up() {
-	this.countup += 1;
-	this.app.setState({countup: this.countup}, this.app.forceUpdate);
-	return this.countup;
-    }
-};
-
 let c = 0;
 class App extends React.Component {
     constructor(props) {
@@ -26,7 +12,6 @@ class App extends React.Component {
 
     componentDidMount() {
 	this.hello_prx = new HelloPrx(this.props.object_client, 'Hello');
-	//this.props.object_server.add_object("countup", new CountUp(this));
 	this.hello_prx.sayHello().then((res) => {
 	    this.setState({...this.state, greeting: res + " first time"});
 	});
