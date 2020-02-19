@@ -4,7 +4,6 @@ def exportclass(cls):
     print("decorator")
     return cls
 
-
 def __save_assigned_port(assigned_port, named_pipe_fn):
     print("running server at port", assigned_port, named_pipe_fn)
     with open(named_pipe_fn, "w") as named_pipe_fd:
@@ -31,7 +30,13 @@ class ObjectServer:
         ret = b_method(**args)
         print("ret:", call_id)
 
-        return {'call_return': ret, 'call_id': call_id}
+        return {'action': 'remote-call-response',
+                'call_id': call_id,
+                'call_return': ret}
+
+class WSHandler:
+    def __init__(self):
+        self.object_server = ObjectServer()
         
     async def message_loop(self, ws, path):
         async for message in ws:
@@ -40,6 +45,6 @@ class ObjectServer:
             if message_json['action'] == 'remote-call':
                 call_args = message_json['action-args']
                 call_id = message_json['call_id']
-                message_action_ret = self.do_message_action(call_id, call_args)
+                message_action_ret = self.object_server.do_message_action(call_id, call_args)
             print("message_action_ret:", message_action_ret)
             await ws.send(json.dumps(message_action_ret))

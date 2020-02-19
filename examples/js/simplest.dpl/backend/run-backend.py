@@ -28,12 +28,13 @@ if __name__ == "__main__":
         # more on pdeathsignal: https://stackoverflow.com/questions/284325/how-to-make-child-process-die-after-parent-exits
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
     xfn = sys.argv[1]
-    o_server = libdipole.ObjectServer()
-    print("adding object Hello")
-    o_server.add_object("Hello", Hello())
 
-    o_server_l = websockets.serve(o_server.message_loop, 'localhost', 0)
-    asyncio.get_event_loop().run_until_complete(o_server_l)
-    assigned_port = libdipole.autoport.find_ws_port(o_server_l)
+    ws_handler = libdipole.WSHandler();
+    print("adding object Hello")
+    ws_handler.object_server.add_object("Hello", Hello())
+
+    ws_l = websockets.serve(ws_handler.message_loop, 'localhost', 0)
+    asyncio.get_event_loop().run_until_complete(ws_l)
+    assigned_port = libdipole.autoport.find_ws_port(ws_l)
     libdipole.__save_assigned_port(assigned_port, xfn)
     asyncio.get_event_loop().run_forever()

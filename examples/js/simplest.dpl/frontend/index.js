@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import {connectToBackend} from 'libdipole-js';
 import App from './App.js';
 
-connectToBackend().then((obj_client) => {
-    ReactDOM.render(<App obj_client={obj_client}/>, document.getElementById('root'));
+connectToBackend().then((ws_handler) => {
+    ReactDOM.render(<App object_client={ws_handler.object_client}
+		    object_server={ws_handler.object_server}/>,
+		    document.getElementById('root'));
 });

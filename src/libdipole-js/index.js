@@ -1,4 +1,6 @@
 import ObjectClient from './ObjectClient.js';
+import ObjectServer from './ObjectServer.js';
+import WSHandler from './WSHandler.js';
 
 export function getArgv() {
     return new Promise((resolve, reject) => {
@@ -25,7 +27,7 @@ function getBackendPort() {
 
 export function connectToBackend() {
     return getBackendPort().then((port) => {
-	let object_client = new ObjectClient(`ws://localhost:${port}`);
-	return object_client.connect();
+	let ws_handler = new WSHandler(`ws://localhost:${port}`);
+	return ws_handler.connect();
     });
 }
