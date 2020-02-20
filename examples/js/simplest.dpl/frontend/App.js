@@ -18,14 +18,18 @@ class App extends React.Component {
     }
     
     onClick() {
-	this.hello_prx.sayHello().then((res) => {
+	Promise.resolve().then(() => {
+	    return this.hello_prx.sayHello();
+	}).then((res) => {
 	    c += 1;
 	    this.setState({...this.state, greeting: res + c});
-	});
-	this.hello_prx.sayAloha('hawaii').then((res) => {
+	}).then(() => {
+	    return this.hello_prx.sayAloha('hawaii');
+	}).then((res) => {
 	    this.setState({...this.state, greeting2: res});
-	});
-	this.hello_prx.get_holidays().then(x => {
+	}).then(() => {
+	    return this.hello_prx.get_holidays();
+	}).then(x => {
 	    this.setState({holidays: x});
 	});
     }
