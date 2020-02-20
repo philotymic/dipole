@@ -37,6 +37,12 @@ class ObjectServer:
                 'call_id': call_id,
                 'call_return': ret}
 
+def set_result_f(args):
+    print("args:", args)
+    fut = args[0]
+    result = args[1]
+    fut.set_result(result)
+    
 class ObjectClient:
     def __init__(self, ws_handler):
         self.pending_calls = {} # call_id -> call_o
@@ -47,7 +53,8 @@ class ObjectClient:
         call_o = {
             'call_request': call_req,
             'call_id': str(uuid.uuid1()),
-            'result_fut': result_fut
+            'result_fut': result_fut,
+            'loop': asyncio.get_event_loop()
             }
         self.pending_calls[call_o['call_id']] = call_o
 
@@ -60,8 +67,7 @@ class ObjectClient:
         print("socket.send, call_id:", call_o['call_id'])
         print("socket.send:", call_message)
         await self.ws_handler.ws.send(json.dumps(call_message))
-        #ret = await result_fut
-        ret = None
+        ret = await result_fut
         return ret
         
     def deliver_response(self, res):
@@ -69,7 +75,10 @@ class ObjectClient:
         print("deliver_response, call_id:", call_id)
         call_o = self.pending_calls[call_id]
         del self.pending_calls[call_id]
-        call_o['result_fut'].set_result(res['call_return'])        
+        result_fut = call_o['result_fut']
+        thread_loop = call_o['loop']
+        #call_o['result_fut'].set_result(res['call_return'])
+        thread_loop.call_soon_threadsafe(set_result_f, [result_fut, res['call_return']])
         
 class WSHandler:
     def __init__(self):
