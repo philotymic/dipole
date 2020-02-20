@@ -1,20 +1,27 @@
 import React from 'react';
 import HelloPrx from './gen-js/HelloPrx.js';
 
-class CountUp
-{
-    constructor(app) {
-	this.app = app;
-	this.countup = 0;
-    }
-
+class CountUp {
     __call_method(method, args_json) {
 	if (method == 'do_one_count_up') {
 	    let args = [args_json['countup_v']];
 	    return this.do_one_count_up(...args);
 	}
     }
-    
+
+    do_one_count_up(countup_v) {
+	throw new Error("not implemnted");
+    }
+}    
+
+class CountUpI extends CountUp
+{
+    constructor(app) {
+	super();
+	this.app = app;
+	this.countup = 0;
+    }
+
     do_one_count_up(countup_v) {
 	console.log("CountUp::do_one_count_up:", countup_v)
 	this.countup += 1;
@@ -38,7 +45,7 @@ class App extends React.Component {
     componentDidMount() {
 	console.log("componentDidMount");
 	this.hello_prx = new HelloPrx(this.props.object_client, 'Hello');	
-	let new_obj = new CountUp(this);
+	let new_obj = new CountUpI(this);
 	this.props.object_server.add_object("countup", new_obj);
 	this.hello_prx.sayHello().then((res) => {
 	    this.setState({...this.state, greeting: res + " first time"});
