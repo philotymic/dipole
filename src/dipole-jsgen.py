@@ -1,24 +1,23 @@
-#import ipdb
+import ipdb
 import sys, os, glob
 import ast
 
-class JSClassDef:
+class ClassDef:
     def __init__(self, class_name):
         self.class_name = class_name
         self.methods = []
 
-class JSClassMethodDef:
-    def __init__(self, js_class, method_name):
-        self.js_class = js_class
+class ClassMethodDef:
+    def __init__(self, class_def, method_name):
+        self.class_def = class_def
         self.method_name = method_name
         self.method_args = []
 
-js_classes = []
-
-def generate_js_file(out_dir):
-    for js_class in js_classes:
-        prx_class_name = js_class.class_name + "Prx"
-        out_fd = open(os.path.join(out_dir, prx_class_name + ".js"), "w")
+def generate_js_file(class_defs, out_fn):
+    print("out file:", out_fn)
+    out_fd = open(out_fn, "w")
+    for class_def in class_defs:
+        prx_class_name = class_def.class_name + "Prx"
 
         print("class", prx_class_name, "{", file = out_fd)
         print("""
@@ -27,72 +26,82 @@ def generate_js_file(out_dir):
           this.remote_obj_id = remote_obj_id;
         }
         """, file = out_fd)
-        for js_method in filter(lambda x: x.method_name != "__init__", js_class.methods):
-            method_args_l = filter(lambda x: x != 'self', js_method.method_args)
+        for method in class_def.methods:
+            method_args_l = filter(lambda x: x != 'self', method.method_args)
             print("        ", file = out_fd)
-            print(js_method.method_name, "(", ",".join(method_args_l), ") {", file = out_fd)
-            method_args_l = ["'%s': %s" % (arg, arg) for arg in js_method.method_args if arg != 'self']
+            print(method.method_name, "(", ",".join(method_args_l), ") {", file = out_fd)
+            method_args_l = ["'%s': %s" % (arg, arg) for arg in method.method_args if arg != 'self']
             print("""
             let call_req = {'obj_id': this.remote_obj_id,
 	                    'call_method': '%s',
 		            'args': JSON.stringify({%s})};
 	    return this.ws_handler.object_client.do_remote_call(call_req).then((ret) => {return ret});
             }
-            """ % (js_method.method_name, ",".join(method_args_l)), file = out_fd)
+            """ % (method.method_name, ",".join(method_args_l)), file = out_fd)
             
         print("};", file = out_fd)
         print("export default", prx_class_name, ";", file = out_fd)
-        out_fd.close()
-        
-def handle_dipole_export_class(ast_node):
+
+    out_fd.close()
+
+def generate_py_file(class_def, out_fn):
+    print("out file:", out_fn)
+    out_fd = open(out_fn, "w")
+    for class_def in class_defs:
+        print("class %s:" % class_def.class_name, file = out_fd)
+        for method in class_def.methods:
+            method_args_l = filter(lambda x: x != 'self', method.method_args)
+            print("\tdef %s(%s): raise Exception('not implemented')" % (method.method_name, ",".join(method.method_args)), file = out_fd)
+    out_fd.close()
+            
+def parse_pyidl_class(ast_node):
     print("class:", ast_node.name)
-    js_class = JSClassDef(ast_node.name)
+    class_def = ClassDef(ast_node.name)
     
     for node in ast_node.body:
         if isinstance(node, ast.FunctionDef):
             print("function:", node.name)
-            js_method = JSClassMethodDef(ast_node.name, node.name)
+            class_method = ClassMethodDef(ast_node.name, node.name)
             for arg_node in node.args.args:
                 #ipdb.set_trace()
                 print("arg:", arg_node.arg)
-                js_method.method_args.append(arg_node.arg)
-            js_class.methods.append(js_method)
+                class_method.method_args.append(arg_node.arg)
+            class_def.methods.append(class_method)
 
-    js_classes.append(js_class)
+    return class_def
 
-def translate_file(py_fn, out_dir):
-    source_code = "\n".join(open(py_fn).readlines())
+def parse_file(pyidl_fn):
+    source_code = "\n".join(open(pyidl_fn).readlines())
+    class_defs = []
     #print source_code[:100]
     pt = ast.parse(source_code)
     #print ast.dump(pt)
     for node in ast.walk(pt):
-        #print node, type(node)
+        print(node, type(node))
+        #ipdb.set_trace()
         if isinstance(node, ast.ClassDef):
-            decorators = node.decorator_list
-            if len(decorators) == 0:
-                continue
-            found_dipole_export_class = False
-            for decorator in decorators:
-                if decorator.value.id == "libdipole" and decorator.attr == "exportclass":
-                    found_dipole_export_class = True
-                    break;
-
-            if found_dipole_export_class:
-                print("dipole.exportclass:", node)
-                handle_dipole_export_class(node)
+            print("pyidl class:", node)
+            class_def = parse_pyidl_class(node)
+            class_defs.append(class_def)
 
     print("walk is done")
-    print(js_classes)
-    print("out_dir:", out_dir)
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-    generate_js_file(out_dir)
-    
+    return class_defs
     
 if __name__ == "__main__":
-    out_dir = sys.argv[1]
-    py_dir = sys.argv[2]
+    pyidl_dir = sys.argv[1]
+    out_dir = sys.argv[2]
+    out_lang = sys.argv[3]
 
-    for py_fn in glob.glob(os.path.join(py_dir, "*.py")):
-        print("translate", py_fn)
-        translate_file(py_fn, out_dir)
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    
+    for pyidl_fn in glob.glob(os.path.join(pyidl_dir, "*.pyidl")):
+        out_fn_b = os.path.join(out_dir, os.path.basename(pyidl_fn).split(".")[0])
+        print("parse", pyidl_fn)
+        class_defs = parse_file(pyidl_fn)
+        if out_lang == "js":
+            generate_js_file(class_defs, out_fn_b + ".js")
+        elif out_lang == "py":
+            generate_py_file(class_defs, out_fn_b + ".py")
+        
+    

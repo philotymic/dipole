@@ -12,7 +12,9 @@ def build_cmds(top):
     dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"    
 
     cmds = []
-    cmds.append("{dipole_jsgen} {top}/frontend/gen-js {top}/backend".format(**dd))
+    cmds.append("{dipole_jsgen} {top}/backend {top}/frontend/gen-js js".format(**dd))
+    cmds.append("{dipole_jsgen} {top}/backend {top}/backend/gen-py py".format(**dd))
+    
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
 

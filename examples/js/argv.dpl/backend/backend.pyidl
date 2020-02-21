@@ -1,0 +1,2 @@
+class Argv:
+    def sayHello(self): pass

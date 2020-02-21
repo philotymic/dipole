@@ -7,8 +7,10 @@ sys.path.append(os.path.join(os.environ['dipole_topdir'], "src"))
 import libdipole
 import libdipole.autoport
 
-@libdipole.exportclass
-class Hello:
+sys.path.append(os.path.join(os.environ['topdir'], "backend", "gen-py"))
+import backend
+
+class HelloI(backend.Hello):
     def sayHello(self):
         print("Hello World!")
         return "Hello, World!"
@@ -32,7 +34,7 @@ if __name__ == "__main__":
     object_server = libdipole.ObjectServer()
     ws_handler = libdipole.WSHandler(object_server);
     print("adding object Hello")
-    object_server.add_object("Hello", Hello())
+    object_server.add_object("Hello", HelloI())
 
     ws_l = websockets.serve(ws_handler.message_loop, 'localhost', 0)
     asyncio.get_event_loop().run_until_complete(ws_l)

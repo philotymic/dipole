@@ -10,6 +10,8 @@ import libdipole.autoport
 import threading, time
 import json
 
+import backend
+
 def thread_w_loop(target, args):    
     nl = asyncio.new_event_loop()
     asyncio.set_event_loop(nl)
@@ -19,27 +21,9 @@ def run_thread_w_loop(target, args):
     t = threading.Thread(target = thread_w_loop, args = (target, args))
     t.start()
 
-class CountUp:
-    def do_one_count_up(self, countup_v): pass
-
-class CountUpPrx(CountUp):
-    def __init__(self, ws_handler, remote_obj_id):
-        self.ws_handler = ws_handler
-        self.remote_obj_id = remote_obj_id
-        
-    async def do_one_count_up(self, countup_v):
-        call_req = {
-            'obj_id': self.remote_obj_id,
-            'call_method': 'do_one_count_up',
-            'args': json.dumps({'countup_v': countup_v})
-        }
-        print("CountUpPrx::do_one_count_up:", call_req)
-        call_ret = await self.ws_handler.object_client.do_remote_call(call_req)
-        return call_ret
-
 async def countup_thread(ws_handler, remote_obj_id):
     print("countup_thread started")
-    countup_prx = CountUpPrx(ws_handler, remote_obj_id)
+    countup_prx = backend.CountUpPrx(ws_handler, remote_obj_id)
     c = 0
     while 1:
         res = await countup_prx.do_one_count_up(c)
@@ -47,11 +31,7 @@ async def countup_thread(ws_handler, remote_obj_id):
         c += 1
         await asyncio.sleep(2)
     
-@libdipole.exportclass
-class Hello:
-    def __init__(self, ws_handler):
-        self.ws_handler = ws_handler
-        
+class HelloI(backend.Hello):
     def sayHello(self):
         print("Hello World!")
         return "Hello, World!"
@@ -65,8 +45,8 @@ class Hello:
         print("get_holidays")
         return ["20190101", "20200101"]
 
-    def run_countup(self, remote_obj_id):
-        t_args = (self.ws_handler, remote_obj_id)
+    def run_countup(self, remote_obj_id, ctx):
+        t_args = (ctx.ws_handler, remote_obj_id)
         run_thread_w_loop(target = countup_thread, args = t_args)
     
 if __name__ == "__main__":
@@ -79,7 +59,7 @@ if __name__ == "__main__":
     object_server = libdipole.ObjectServer()
     ws_handler = libdipole.WSHandler(object_server);
     print("adding object Hello")
-    object_server.add_object("Hello", Hello(ws_handler))
+    object_server.add_object("Hello", HelloI())
 
     ws_l = websockets.serve(ws_handler.message_loop, 'localhost', 0)
     asyncio.get_event_loop().run_until_complete(ws_l)

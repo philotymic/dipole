@@ -1,0 +1,9 @@
+class CountUp:
+    def do_one_count_up(self, countup_v): pass
+
+class Hello:
+    def sayHello(self): pass
+    def sayAloha(self, language): pass
+    def get_holidays(self): pass
+    @pass_calling_context
+    def run_countup(self, remote_obj_id): pass
