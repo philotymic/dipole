@@ -13,23 +13,6 @@ import json
 sys.path.append(os.path.join(os.environ['topdir'], "backend", "gen-py"))
 import backend
 
-# this class suppose to be generated and available as backend.CountUpPrx
-class CountUpPrx:
-    def __init__(self, ws_handler, remote_obj_id):
-        self.ws_handler = ws_handler
-        self.remote_obj_id = remote_obj_id
-        
-    async def do_one_count_up(self, countup_v):
-        call_req = {
-            'obj_id': self.remote_obj_id,
-            'call_method': 'do_one_count_up',
-            'pass_calling_context': False,
-            'args': json.dumps({'countup_v': countup_v})
-        }
-        print("CountUpPrx::do_one_count_up:", call_req)
-        call_ret = await self.ws_handler.object_client.do_remote_call(call_req)
-        return call_ret    
-
 def thread_w_loop(target, args):    
     nl = asyncio.new_event_loop()
     asyncio.set_event_loop(nl)
@@ -41,7 +24,7 @@ def run_thread_w_loop(target, args):
 
 async def countup_thread(ws_handler, remote_obj_id):
     print("countup_thread started")
-    countup_prx = CountUpPrx(ws_handler, remote_obj_id)
+    countup_prx = backend.CountUpPrx(ws_handler, remote_obj_id)
     c = 0
     while 1:
         res = await countup_prx.do_one_count_up(c)

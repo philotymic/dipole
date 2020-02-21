@@ -1,21 +1,7 @@
 import React from 'react';
 import * as backend from './gen-js/backend.js';
 
-// this class suppose to be generated and available as backend.CountUp
-class CountUp {
-    __call_method(method, args_json) {
-	if (method == 'do_one_count_up') {
-	    let args = [args_json['countup_v']];
-	    return this.do_one_count_up(...args);
-	}
-    }
-
-    do_one_count_up(countup_v) {
-	throw new Error("not implemnted");
-    }
-}    
-
-class CountUpI extends CountUp
+class CountUpI extends backend.CountUp
 {
     constructor(app) {
 	super();
