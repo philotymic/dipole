@@ -67,7 +67,7 @@ class ObjectClient:
         call_message = {
             'call_id': call_o['call_id'],
             'action': 'remote-call',
-            'action-args': call_o['call_request']
+            'action_args': call_o['call_request']
             }
         
         print("socket.send, call_id:", call_o['call_id'])
@@ -99,7 +99,7 @@ class WSHandler:
             print("async on_message:", message)
             message_json = json.loads(message)
             if message_json['action'] == 'remote-call':
-                call_args = message_json['action-args']
+                call_args = message_json['action_args']
                 call_id = message_json['call_id']
                 message_action_ret = self.object_server.do_message_action(call_id, call_args, self)
                 print("message_action_ret:", message_action_ret)

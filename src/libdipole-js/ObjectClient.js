@@ -26,7 +26,7 @@ class ObjectClient {
 	    let call_message = {
 		'call_id': call_o.call_id,
 		'action': 'remote-call',
-		'action-args': call_o.call_request
+		'action_args': call_o.call_request
 	    };
 	    console.log("socket.send, call_id:", call_o.call_id);
 	    console.log("socket.send:", call_message);	    
