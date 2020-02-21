@@ -13,6 +13,7 @@ import json
 sys.path.append(os.path.join(os.environ['topdir'], "backend", "gen-py"))
 import backend
 
+# this class suppose to be generated and available as backend.CountUpPrx
 class CountUpPrx:
     def __init__(self, ws_handler, remote_obj_id):
         self.ws_handler = ws_handler

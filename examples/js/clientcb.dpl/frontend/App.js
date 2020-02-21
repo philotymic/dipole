@@ -1,6 +1,7 @@
 import React from 'react';
 import * as backend from './gen-js/backend.js';
 
+// this class suppose to be generated and available as backend.CountUp
 class CountUp {
     __call_method(method, args_json) {
 	if (method == 'do_one_count_up') {
