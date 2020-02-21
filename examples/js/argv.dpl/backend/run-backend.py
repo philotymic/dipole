@@ -20,7 +20,9 @@ if __name__ == "__main__":
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
 
     xfn = sys.argv[1]
-    ws_handler = libdipole.WSHandler()
+
+    object_server = libdipole.ObjectServer()
+    ws_handler = libdipole.WSHandler(object_server);
     print("adding object Argv")
     ws_handler.object_server.add_object("Argv", Argv())
 

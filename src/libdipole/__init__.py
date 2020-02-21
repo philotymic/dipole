@@ -11,20 +11,19 @@ def __save_assigned_port(assigned_port, named_pipe_fn):
         print(assigned_port, file = named_pipe_fd)
 
 class ObjectServer:
-    def __init__(self, ws_handler):
-        self.ws_handler = ws_handler
+    def __init__(self):
         self.objects = {}
 
     def add_object(self, object_id, obj):
-        obj.ws_handler = self.ws_handler
         self.objects[object_id] = obj
-
-    def do_message_action(self, call_id, call_args):
-        print('do_message_action:', call_args)
+        
+    def do_message_action(self, call_id, call_args, ws_handler):
+        print('handle_message:', call_args)
         #ipdb.set_trace()
         object_id = call_args['obj_id']
         method = call_args['call_method']
         args = json.loads(call_args['args'])
+        #args["ctx__"] = ws_handler
 
         print("looking up obj", object_id)
         obj = self.objects[object_id]
@@ -48,7 +47,7 @@ class ObjectClient:
         self.pending_calls = {} # call_id -> call_o
         self.ws_handler = ws_handler
         
-    async def do_call(self, call_req):
+    async def do_remote_call(self, call_req):
         result_fut = asyncio.Future()
         call_o = {
             'call_request': call_req,
@@ -81,8 +80,8 @@ class ObjectClient:
         thread_loop.call_soon_threadsafe(set_result_f, [result_fut, res['call_return']])
         
 class WSHandler:
-    def __init__(self):
-        self.object_server = ObjectServer(self)
+    def __init__(self, object_server):
+        self.object_server = object_server
         self.object_client = ObjectClient(self)
         self.ws = None
         
@@ -95,7 +94,7 @@ class WSHandler:
             if message_json['action'] == 'remote-call':
                 call_args = message_json['action-args']
                 call_id = message_json['call_id']
-                message_action_ret = self.object_server.do_message_action(call_id, call_args)
+                message_action_ret = self.object_server.do_message_action(call_id, call_args, self)
                 print("message_action_ret:", message_action_ret)
                 await ws.send(json.dumps(message_action_ret))
             elif message_json['action'] == 'remote-call-response':

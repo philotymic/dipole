@@ -27,7 +27,8 @@ function getBackendPort() {
 
 export function connectToBackend() {
     return getBackendPort().then((port) => {
-	let ws_handler = new WSHandler(`ws://localhost:${port}`);
-	return ws_handler.connect();
+	let object_server = new ObjectServer();
+	let ws_handler = new WSHandler(object_server);
+	return ws_handler.connect(`ws://localhost:${port}`);
     });
 }

@@ -11,7 +11,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-	this.hello_prx = new HelloPrx(this.props.object_client, 'Hello');
+	this.hello_prx = new HelloPrx(this.props.ws_handler, 'Hello');
 	this.hello_prx.sayHello().then((res) => {
 	    this.setState({...this.state, greeting: res + " first time"});
 	});

@@ -23,8 +23,8 @@ class CountUp:
     def do_one_count_up(self, countup_v): pass
 
 class CountUpPrx(CountUp):
-    def __init__(self, object_client, remote_obj_id):
-        self.object_client = object_client
+    def __init__(self, ws_handler, remote_obj_id):
+        self.ws_handler = ws_handler
         self.remote_obj_id = remote_obj_id
         
     async def do_one_count_up(self, countup_v):
@@ -34,12 +34,12 @@ class CountUpPrx(CountUp):
             'args': json.dumps({'countup_v': countup_v})
         }
         print("CountUpPrx::do_one_count_up:", call_req)
-        call_ret = await self.object_client.do_call(call_req)
+        call_ret = await self.ws_handler.object_client.do_remote_call(call_req)
         return call_ret
 
-async def countup_thread(object_client, remote_obj_id):
+async def countup_thread(ws_handler, remote_obj_id):
     print("countup_thread started")
-    countup_prx = CountUpPrx(object_client, remote_obj_id)
+    countup_prx = CountUpPrx(ws_handler, remote_obj_id)
     c = 0
     while 1:
         res = await countup_prx.do_one_count_up(c)
@@ -49,6 +49,9 @@ async def countup_thread(object_client, remote_obj_id):
     
 @libdipole.exportclass
 class Hello:
+    def __init__(self, ws_handler):
+        self.ws_handler = ws_handler
+        
     def sayHello(self):
         print("Hello World!")
         return "Hello, World!"
@@ -63,7 +66,7 @@ class Hello:
         return ["20190101", "20200101"]
 
     def run_countup(self, remote_obj_id):
-        t_args = (self.ws_handler.object_client, remote_obj_id)
+        t_args = (self.ws_handler, remote_obj_id)
         run_thread_w_loop(target = countup_thread, args = t_args)
     
 if __name__ == "__main__":
@@ -73,9 +76,10 @@ if __name__ == "__main__":
         prctl.set_pdeathsig(signal.SIGTERM) # if parent dies this child will get SIGTERM
     xfn = sys.argv[1]
 
-    ws_handler = libdipole.WSHandler();
+    object_server = libdipole.ObjectServer()
+    ws_handler = libdipole.WSHandler(object_server);
     print("adding object Hello")
-    ws_handler.object_server.add_object("Hello", Hello())
+    object_server.add_object("Hello", Hello(ws_handler))
 
     ws_l = websockets.serve(ws_handler.message_loop, 'localhost', 0)
     asyncio.get_event_loop().run_until_complete(ws_l)

@@ -1,6 +1,6 @@
 class ObjectServer
 {
-    constructor(obj_client) {
+    constructor() {
 	this.objects = new Map();	    
     }
 

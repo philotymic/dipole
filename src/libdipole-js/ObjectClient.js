@@ -11,7 +11,7 @@ class ObjectClient {
 	this.deliver_response = this.deliver_response.bind(this);
     }
 
-    do_call(call_req) {
+    do_remote_call(call_req) {
 	return new Promise((resolve, reject) => {
 	    if (this.pending_calls.size > 1) {
 		console.error("this.pending_calls is too big");
@@ -30,7 +30,7 @@ class ObjectClient {
 	    };
 	    console.log("socket.send, call_id:", call_o.call_id);
 	    console.log("socket.send:", call_message);	    
-	    this.ws_handler.socket.send(JSON.stringify(call_message));
+	    this.ws_handler.ws.send(JSON.stringify(call_message));
 	});
     };
     

@@ -6,7 +6,7 @@ import ArgvPrx from "./gen-js/ArgvPrx.js";
 class App extends React.Component {
     constructor(props) {
 	super(props);
-	this.test_prx = new ArgvPrx(this.props.object_client, "Argv");
+	this.test_prx = new ArgvPrx(this.props.ws_handler, "Argv");
 	this.state = {test_response: null};
     }
 
@@ -29,6 +29,6 @@ getArgv().then((argv_) => {
 }).then(() => {
     return connectToBackend();
 }).then((ws_handler) => {
-    ReactDOM.render(<App object_client={ws_handler.object_client}
-		         argv={argv}/>, document.getElementById('root'));
+    ReactDOM.render(<App ws_handler={ws_handler} argv={argv}/>,
+		    document.getElementById('root'));
 });
