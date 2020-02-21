@@ -22,6 +22,7 @@ class CountUpPrx:
         call_req = {
             'obj_id': self.remote_obj_id,
             'call_method': 'do_one_count_up',
+            'pass_calling_context': False,
             'args': json.dumps({'countup_v': countup_v})
         }
         print("CountUpPrx::do_one_count_up:", call_req)
