@@ -1,3 +1,4 @@
+#import ipdb
 import asyncio
 import json, uuid
 
@@ -10,6 +11,10 @@ def __save_assigned_port(assigned_port, named_pipe_fn):
     with open(named_pipe_fn, "w") as named_pipe_fd:
         print(assigned_port, file = named_pipe_fd)
 
+class CallingContext:
+    def __init__(self, ws_handler):
+        self.ws_handler = ws_handler
+        
 class ObjectServer:
     def __init__(self):
         self.objects = {}
@@ -23,7 +28,9 @@ class ObjectServer:
         object_id = call_args['obj_id']
         method = call_args['call_method']
         args = json.loads(call_args['args'])
-        #args["ctx__"] = ws_handler
+        pass_calling_context = call_args['pass_calling_context']
+        if pass_calling_context:
+            args["ctx"] = CallingContext(ws_handler)
 
         print("looking up obj", object_id)
         obj = self.objects[object_id]

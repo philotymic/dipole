@@ -8,12 +8,12 @@ def install_cmds(top):
 def build_cmds(top):
     dd = {}
     dd["top"] = top
-    dd["dipole_jsgen"] = "python {dipole_dir}/src/dipole-jsgen.py".format(dipole_dir = ".")
+    dd["dipole_gen"] = "python {dipole_dir}/src/dipole-gen.py".format(dipole_dir = ".")
     dd["rollup"] = "./node_modules/rollup/dist/bin/rollup"    
 
     cmds = []
-    cmds.append("{dipole_jsgen} {top}/backend {top}/frontend/gen-js js".format(**dd))
-    cmds.append("{dipole_jsgen} {top}/backend {top}/backend/gen-py py".format(**dd))
+    cmds.append("{dipole_gen} {top}/backend {top}/frontend/gen-js js".format(**dd))
+    cmds.append("{dipole_gen} {top}/backend {top}/backend/gen-py py".format(**dd))
     
     cmds.append("cd {top}/frontend && {rollup} -c".format(**dd))
     return cmds
@@ -45,4 +45,3 @@ if __name__ == "__main__":
         if e_code != 0:
             print("command failed")
             break
-    

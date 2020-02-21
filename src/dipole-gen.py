@@ -8,10 +8,15 @@ class ClassDef:
         self.methods = []
 
 class ClassMethodDef:
-    def __init__(self, class_def, method_name):
+    def __init__(self, class_def, method_name, method_node):
         self.class_def = class_def
         self.method_name = method_name
         self.method_args = []
+        self.pass_calling_context = False
+        if len(method_node.decorator_list) > 0:
+            dcr = method_node.decorator_list[0].id
+            if dcr == 'pass_calling_context':
+                self.pass_calling_context = True
 
 def generate_js_file(class_defs, out_fn):
     print("out file:", out_fn)
@@ -19,7 +24,7 @@ def generate_js_file(class_defs, out_fn):
     for class_def in class_defs:
         prx_class_name = class_def.class_name + "Prx"
 
-        print("class", prx_class_name, "{", file = out_fd)
+        print("export class", prx_class_name, "{", file = out_fd)
         print("""
         constructor(ws_handler, remote_obj_id) {
           this.ws_handler = ws_handler;
@@ -34,24 +39,26 @@ def generate_js_file(class_defs, out_fn):
             print("""
             let call_req = {'obj_id': this.remote_obj_id,
 	                    'call_method': '%s',
+                            'pass_calling_context': %s,
 		            'args': JSON.stringify({%s})};
 	    return this.ws_handler.object_client.do_remote_call(call_req).then((ret) => {return ret});
             }
-            """ % (method.method_name, ",".join(method_args_l)), file = out_fd)
+            """ % (method.method_name, "true" if method.pass_calling_context else "false", ",".join(method_args_l)), file = out_fd)
             
         print("};", file = out_fd)
-        print("export default", prx_class_name, ";", file = out_fd)
 
     out_fd.close()
 
-def generate_py_file(class_def, out_fn):
+def generate_py_file(class_defs, out_fn):
     print("out file:", out_fn)
     out_fd = open(out_fn, "w")
     for class_def in class_defs:
         print("class %s:" % class_def.class_name, file = out_fd)
         for method in class_def.methods:
-            method_args_l = filter(lambda x: x != 'self', method.method_args)
-            print("\tdef %s(%s): raise Exception('not implemented')" % (method.method_name, ",".join(method.method_args)), file = out_fd)
+            method_args = method.method_args
+            if method.pass_calling_context:
+                method_args.append("ctx")
+            print("\tdef %s(%s): raise Exception('not implemented')" % (method.method_name, ",".join(method_args)), file = out_fd)
     out_fd.close()
             
 def parse_pyidl_class(ast_node):
@@ -61,7 +68,8 @@ def parse_pyidl_class(ast_node):
     for node in ast_node.body:
         if isinstance(node, ast.FunctionDef):
             print("function:", node.name)
-            class_method = ClassMethodDef(ast_node.name, node.name)
+            #ipdb.set_trace()
+            class_method = ClassMethodDef(ast_node.name, node.name, node)
             for arg_node in node.args.args:
                 #ipdb.set_trace()
                 print("arg:", arg_node.arg)
@@ -75,7 +83,9 @@ def parse_file(pyidl_fn):
     class_defs = []
     #print source_code[:100]
     pt = ast.parse(source_code)
-    #print ast.dump(pt)
+    #print(ast.dump(pt))
+    #return None
+
     for node in ast.walk(pt):
         print(node, type(node))
         #ipdb.set_trace()

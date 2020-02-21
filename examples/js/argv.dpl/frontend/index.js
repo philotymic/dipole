@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {getArgv, connectToBackend} from 'libdipole-js';
-import ArgvPrx from "./gen-js/ArgvPrx.js";
+import * as backend from "./gen-js/backend.js";
 
 class App extends React.Component {
     constructor(props) {
 	super(props);
-	this.test_prx = new ArgvPrx(this.props.ws_handler, "Argv");
+	this.test_prx = new backend.ArgvPrx(this.props.ws_handler, "Argv");
 	this.state = {test_response: null};
     }
 

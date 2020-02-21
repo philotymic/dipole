@@ -7,6 +7,7 @@ sys.path.append(os.path.join(os.environ['dipole_topdir'], "src"))
 import libdipole
 import libdipole.autoport
 
+sys.path.append(os.path.join(os.environ['topdir'], "backend", "gen-py"))
 import backend
 
 class ArgvI(backend.Argv):

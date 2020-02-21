@@ -1,5 +1,5 @@
 import React from 'react';
-import HelloPrx from './gen-js/HelloPrx.js';
+import * as backend from './gen-js/backend.js';
 
 class CountUp {
     __call_method(method, args_json) {
@@ -44,7 +44,7 @@ class App extends React.Component {
 
     componentDidMount() {
 	console.log("componentDidMount");
-	this.hello_prx = new HelloPrx(this.props.ws_handler, 'Hello');	
+	this.hello_prx = new backend.HelloPrx(this.props.ws_handler, 'Hello');	
 	let new_obj = new CountUpI(this);
 	this.props.ws_handler.object_server.add_object("countup", new_obj);
 	this.hello_prx.sayHello().then((res) => {

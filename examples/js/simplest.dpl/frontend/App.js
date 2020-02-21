@@ -1,5 +1,5 @@
 import React from 'react';
-import HelloPrx from './gen-js/HelloPrx.js';
+import * as backend from './gen-js/backend.js';
 
 let c = 0;
 class App extends React.Component {
@@ -11,7 +11,7 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-	this.hello_prx = new HelloPrx(this.props.ws_handler, 'Hello');
+	this.hello_prx = new backend.HelloPrx(this.props.ws_handler, 'Hello');
 	this.hello_prx.sayHello().then((res) => {
 	    this.setState({...this.state, greeting: res + " first time"});
 	});
