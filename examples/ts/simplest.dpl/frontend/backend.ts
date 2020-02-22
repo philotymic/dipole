@@ -15,7 +15,7 @@ export class HelloPrx {
 	    obj_id: this.remote_obj_id,
             call_method: 'sayHello',
             pass_calling_context: false,
-            args: JSON.stringify({})
+            args: JSON.stringify([])
 	};
         return this.ws_handler.object_client.do_remote_call(call_req).then((ret: string) => {return ret as string});
     }
@@ -25,8 +25,8 @@ export class HelloPrx {
 	    obj_id: this.remote_obj_id,
             call_method: 'sayAloha',
             pass_calling_context: false,
-            args: JSON.stringify({'language': language})
+            args: JSON.stringify([language])
 	};
         return this.ws_handler.object_client.do_remote_call(call_req).then((ret:string) => {return ret});
-    }    
+    }
 };
