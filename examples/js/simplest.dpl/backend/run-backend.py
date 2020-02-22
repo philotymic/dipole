@@ -32,11 +32,11 @@ if __name__ == "__main__":
     xfn = sys.argv[1]
 
     object_server = libdipole.ObjectServer()
-    ws_handler = libdipole.WSHandler(object_server);
+    ws_handler = libdipole.WSHandler(object_server)
     print("adding object Hello")
     object_server.add_object("Hello", HelloI())
 
-    ws_l = websockets.serve(ws_handler.message_loop, 'localhost', 0)
+    ws_l = websockets.serve(ws_handler.server_message_loop, 'localhost', 0)
     asyncio.get_event_loop().run_until_complete(ws_l)
     assigned_port = libdipole.autoport.find_ws_port(ws_l)
     libdipole.__save_assigned_port(assigned_port, xfn)
