@@ -15,7 +15,7 @@ class ObjectServer
 	let args = JSON.parse(call_args['args']);
 	let pass_calling_context = call_args['pass_calling_context'];
 	if (pass_calling_context) {
-	    args = {...args, ctx: {ws_handler: ws_handler}};
+	    args.push({ws_handler: ws_handler});
 	}
 	
 	console.log("lookup up obj", object_id);

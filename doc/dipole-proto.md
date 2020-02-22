@@ -8,7 +8,7 @@ Serialized call request has JSON form as below. Callee object identified by obj_
   obj_id: string, // callee object id, used to lookup callee object
   call_method: string, // callee method
   pass_calling_context: boolean, // should ObjectServer add ctx argument
-  args: string // serialized arguments used to make method call
+  args: string // serialized arguments list used to make method call
  }
 }
 ```

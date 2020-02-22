@@ -1,5 +1,5 @@
 #import ipdb
-import asyncio
+import asyncio, websockets
 import json, uuid
 
 def exportclass(cls):
@@ -30,13 +30,13 @@ class ObjectServer:
         args = json.loads(call_args['args'])
         pass_calling_context = call_args['pass_calling_context']
         if pass_calling_context:
-            args["ctx"] = CallingContext(ws_handler)
+            args.append(CallingContext(ws_handler))
 
         print("looking up obj", object_id)
         obj = self.objects[object_id]
         b_method = getattr(obj, method)
         ret = None; exc = None
-        ret = b_method(**args)
+        ret = b_method(*args)
         print("ret:", ret)
 
         return {'action': 'remote-call-response',
@@ -92,10 +92,20 @@ class WSHandler:
         self.object_client = ObjectClient(self)
         self.ws = None
         
-    async def message_loop(self, ws, path):
+    async def server_message_loop(self, ws, path):
+        print("accept passed")
         self.ws = ws
+        await self.__message_loop()
+                
+    async def client_message_loop(self, ws_url):
+        print(f"connecting to {ws_url}")
+        self.ws = await websockets.connect(ws_url)
+        asyncio.create_task(self.__message_loop())
+        
+    async def __message_loop(self):
+        print("entering message loop")
         while 1:
-            message = await ws.recv()
+            message = await self.ws.recv()
             print("async on_message:", message)
             message_json = json.loads(message)
             if message_json['action'] == 'remote-call':
@@ -103,7 +113,7 @@ class WSHandler:
                 call_id = message_json['call_id']
                 message_action_ret = self.object_server.do_message_action(call_id, call_args, self)
                 print("message_action_ret:", message_action_ret)
-                await ws.send(json.dumps(message_action_ret))
+                await self.ws.send(json.dumps(message_action_ret))
             elif message_json['action'] == 'remote-call-response':
                 self.object_client.deliver_response(message_json)
-                
+        
