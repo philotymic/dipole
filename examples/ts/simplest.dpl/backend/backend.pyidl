@@ -1,0 +1,4 @@
+class Hello:
+    def sayHello(self): pass
+    def sayAloha(self, language): pass
+    def get_holidays(self): pass

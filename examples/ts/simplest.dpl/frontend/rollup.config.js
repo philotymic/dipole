@@ -20,6 +20,7 @@ export default {
 	resolve(), // tells Rollup how to find date-fns in node_modules
 	commonjs({namedExports: {		
 	    'node_modules/react/index.js': ['createElement', 'Component'],
+	    'node_modules/react-dom/index.js': ['render']
 	    }}), // converts date-fns to ES modules
 	//production && terser() // minify, but only in production
     ]

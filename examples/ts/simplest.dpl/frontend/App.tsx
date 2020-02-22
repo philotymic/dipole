@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {Communicator} from './Communicator';
-import HelloPrx from './HelloPrx';
+import {WSHandler} from './libdipole';
+import * as backend from './backend';
 
 interface AppProps {
-    communicator: Communicator
+    ws_handler: WSHandler
 };
 
 interface AppState {
@@ -13,11 +13,11 @@ interface AppState {
 
 let c: number = 0;
 class App extends React.Component<AppProps, AppState> {
-    hello_prx: HelloPrx;
+    hello_prx: backend.HelloPrx;
     state: AppState = {greeting: 'none', greeting2: 'none'};
     constructor(props: AppProps) {
 	super(props);
-	this.hello_prx = new HelloPrx(this.props.communicator, 'Hello');
+	this.hello_prx = new backend.HelloPrx(this.props.ws_handler, 'Hello');
     }
 
     componentDidMount() {
