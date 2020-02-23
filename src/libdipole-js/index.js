@@ -32,3 +32,10 @@ export function connectToBackend() {
 	return ws_handler.connect(`ws://localhost:${port}`);
     });
 }
+
+export function connectToServer(ws_url) {
+    let object_server = new ObjectServer();
+    let ws_handler = new WSHandler(object_server);
+    return ws_handler.connect(ws_url);
+}
+

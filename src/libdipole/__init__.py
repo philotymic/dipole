@@ -87,7 +87,8 @@ class ObjectClient:
         result_fut = call_o['result_fut']
         thread_loop = call_o['loop']
         #call_o['result_fut'].set_result(res['call_return'])
-        thread_loop.call_soon_threadsafe(set_result_f, [result_fut, res['call_return']])
+        call_return_v = res['call_return'] if 'call_return' in res else None
+        thread_loop.call_soon_threadsafe(set_result_f, [result_fut, call_return_v])
 
 class WSHandler:
     def __init__(self, object_server):
