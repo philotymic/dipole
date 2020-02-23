@@ -22,7 +22,7 @@ class ObjectServer:
     def add_object(self, object_id, obj):
         self.objects[object_id] = obj
         
-    def do_message_action(self, call_id, call_args, ws_handler):
+    async def do_message_action(self, call_id, call_args, ws_handler):
         print('handle_message:', call_args)
         #ipdb.set_trace()
         object_id = call_args['obj_id']
@@ -33,10 +33,14 @@ class ObjectServer:
             args.append(CallingContext(ws_handler))
 
         print("looking up obj", object_id)
+        if not object_id in self.objects:
+            raise Exception("do_message_action: can't find object", object_id)
         obj = self.objects[object_id]
         b_method = getattr(obj, method)
+        if b_method == None:
+            raise Exception("do_message_action: can't find method", method, object_id)
         ret = None; exc = None
-        ret = b_method(*args)
+        ret = await b_method(*args)
         print("ret:", ret)
 
         return {'action': 'remote-call-response',
@@ -44,7 +48,6 @@ class ObjectServer:
                 'call_return': ret}
 
 def set_result_f(args):
-    print("args:", args)
     fut = args[0]
     result = args[1]
     fut.set_result(result)
@@ -85,24 +88,19 @@ class ObjectClient:
         thread_loop = call_o['loop']
         #call_o['result_fut'].set_result(res['call_return'])
         thread_loop.call_soon_threadsafe(set_result_f, [result_fut, res['call_return']])
-        
+
 class WSHandler:
     def __init__(self, object_server):
         self.object_server = object_server
         self.object_client = ObjectClient(self)
         self.ws = None
         
-    async def server_message_loop(self, ws, path):
-        print("accept passed")
-        self.ws = ws
-        await self.__message_loop()
-                
     async def client_message_loop(self, ws_url):
         print(f"connecting to {ws_url}")
         self.ws = await websockets.connect(ws_url)
-        asyncio.create_task(self.__message_loop())
+        asyncio.create_task(self.run_message_loop())
         
-    async def __message_loop(self):
+    async def run_message_loop(self):
         print("entering message loop")
         while 1:
             message = await self.ws.recv()
@@ -111,9 +109,20 @@ class WSHandler:
             if message_json['action'] == 'remote-call':
                 call_args = message_json['action_args']
                 call_id = message_json['call_id']
-                message_action_ret = self.object_server.do_message_action(call_id, call_args, self)
+                message_action_ret = await self.object_server.do_message_action(call_id, call_args, self)
                 print("message_action_ret:", message_action_ret)
                 await self.ws.send(json.dumps(message_action_ret))
             elif message_json['action'] == 'remote-call-response':
                 self.object_client.deliver_response(message_json)
         
+class WSHandlerFactory:
+    def __init__(self, object_server):
+        self.object_server = object_server
+        
+    async def server_message_loop(self, ws, path):
+        print("accept passed")
+        #ipdb.set_trace()
+        ws_handler = WSHandler(self.object_server)
+        ws_handler.ws = ws
+        await ws_handler.run_message_loop()
+                
