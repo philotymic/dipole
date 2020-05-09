@@ -29,6 +29,10 @@ class Backend:
         backend_path = os.path.join(self.dplapp_top, "backend/run-backend.py")
         python_path = sys.executable
         cmd = "{python_path} {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn)
+        # this is example of command to run python backend remote debugger
+        # accessible via remote attach of Visual Studio Code
+        #cmd = "{python_path} -m debugpy --connect localhost:12345 --wait-for-client {backend_path} {xfn}".format(python_path = python_path, backend_path = backend_path, xfn = self.xfn)
+        print(cmd)
         pp = subprocess.Popen(shlex.split(cmd),
                               env = {'topdir': self.dplapp_top,
                                      'dipole_topdir': self.dipole_top})
@@ -79,7 +83,10 @@ if __name__ == '__main__':
     print("URL:", url)
     browser = cef.CreateBrowserSync(url=url, window_title="Hello World!", settings=browser_settings)
     backend.browser = browser
-
+    #ipdb.set_trace()
+    # uncomment line below to spawn debugger on startup
+    #backend.browser.ShowDevTools()
+    
     # see also https://github.com/cztomczak/cefpython/blob/master/examples/snippets/javascript_bindings.py
     bindings = cef.JavascriptBindings()
     bindings.SetFunction("dpl_getArgv", backend.JS_get_argv)
