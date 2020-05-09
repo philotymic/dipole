@@ -11,4 +11,9 @@
 - python ./appbuild/make.py build examples/js/simplest.dpl/
 - python dipole.py examples/js/simplest.dpl/
 
-It would be cool to attach backend via VSC. For python it can be done using pip installable module [debugpy] (https://github.com/microsoft/debugpy/)
+It would be cool to attach backend via VSC. For python it can be done using pip installable module (debugpy) [https://github.com/microsoft/debugpy/]
+
+Intresting projects about Chrome remote debugger:
+
+- https://craig.is/writing/chrome-logger/
+- https://github.com/mirumee/chromedebug
