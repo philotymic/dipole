@@ -7,6 +7,7 @@
 - pip install --user cefpython3
 - sudo apt-get install build-essential libcap-dev
 - pip install --user python-prctl
+- pip install --user websockets
 - python ./appbuild/make.py install examples/js/simplest.dpl/
 - python ./appbuild/make.py build examples/js/simplest.dpl/
 - python dipole.py examples/js/simplest.dpl/
