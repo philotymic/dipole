@@ -1,4 +1,4 @@
-# dipole
+# dipole1
 
 <b>C</b>hrome + python = full power of ReactJS and pandas in one application
 
@@ -10,7 +10,7 @@
 - pip install --user websockets
 - python ./appbuild/make.py install examples/js/simplest.dpl/
 - python ./appbuild/make.py build examples/js/simplest.dpl/
-- python dipole.py examples/js/simplest.dpl/
+- python dipole1.py examples/js/simplest.dpl/
 
 It would be cool to attach backend via VSC. For python it can be done using pip installable module (debugpy) [https://github.com/microsoft/debugpy/]
 
